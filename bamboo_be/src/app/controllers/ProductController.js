@@ -9,6 +9,33 @@ const Sizes = require('../models/Sizes');
 const Colors = require('../models/Colors');
 
 class ProductController {
+    //[GET] /colors
+    indexColor(req, res, next) {
+        Colors.find({})
+            .then((colors) => {
+                res.json(colors);
+            })
+            .catch(next);
+    }
+
+    //[GET] /genders
+    indexGender(req, res, next) {
+        Gender.find({})
+            .then((genders) => {
+                res.json(genders);
+            })
+            .catch(next);
+    }
+
+    //[GET] /sizes
+    indexSize(req, res, next) {
+        Sizes.find({})
+            .then((sizes) => {
+                res.json(sizes);
+            })
+            .catch(next);
+    }
+
     // [GET] /products/:slug
     show(req, res, next) {
         Product.findOne({ slug: req.params.slug })
