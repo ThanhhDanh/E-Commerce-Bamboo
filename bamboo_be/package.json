@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "axios": "^1.11.0",
-        "bcrypt": "^5.1.1",
+        "bcryptjs": "^3.0.2",
         "bootstrap": "^5.2.3",
         "bullmq": "^5.56.9",
         "cloudinary": "^1.30.0",

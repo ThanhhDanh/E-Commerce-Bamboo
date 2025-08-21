@@ -1,6 +1,6 @@
 const User = require('../models/Users');
 const { mutipleMongooseToObject } = require('../../util/mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 class UserController {
     // [GET] /login
