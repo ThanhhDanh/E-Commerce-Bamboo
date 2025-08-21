@@ -1,0 +1,156 @@
+<div class="content-wrapper">
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Đánhg giá
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="container">
+        <h1 class="text-center">Danh sách sản phẩm REVIEW</h1>
+        <form method="POST" action="/reviews/store">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Sao đánh giá</label>
+                        <input type="text" class="form-control" id="rating" value="{{oldData.rating}}" name="rating" placeholder="Rating..." >
+                        {{{validateInput errors "rating"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="commentId" class="form-label">Đánh giá với Bình luận</label>
+                        <select class="form-control" id="commentId" name="commentId">
+                            <option value="">-- Đánh giá với Bình luận --</option>
+                            {{#each comments}} 
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.commentId)}}selected{{/if}}>
+                                    {{this.content}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "commentId"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="productId" class="form-label">Sản phẩm đã bình luận</label>
+                        <select class="form-control" id="productId" name="productId">
+                            <option value="">-- Sản phẩm đã bình luận --</option>
+                            {{#each products}} 
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.productId)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "productId"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="userId" class="form-label">Người bình luận</label>
+                        <select class="form-control" id="userId" name="userId">
+                            <option value="">-- Người bình luận --</option>
+                            {{#each users}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.userId)}}selected{{/if}}>
+                                    {{this.firstName}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "userId"}}}
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-lg">REVIEW</button>
+        </form>
+    </div>
+    
+    <div class="container mt-5">
+        <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                          #
+                        </th>
+                        <th scope="col">Sao</th>
+                        <th scope="col">Đánh giá với Bình luận</th>
+                        <th scope="col">Sản phẩm đã REVIEW</th>
+                        <th scope="col">Người dùng đã REVIEW</th>
+                        <th scope="col">Thời gian tạo</th>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each likes}}
+                    <tr>
+                        <td>{{this._id}}</td>
+                        <td>{{this.rating}}</td>
+                        <td>{{this.commentId}}</td>
+                        <td>{{this.productId}}</td>
+                        <td>{{this.userId}}</td>
+                        <td>{{formatDate this.createdAt 'll'}}</td>
+                        <td class="d-flex flex-column">
+                            <a href="" class="btn btn-danger" data-id="{{this._id}}" data-bs-toggle="modal" data-bs-target="#delete-review-modal">
+                              <i class="fa-regular fa-trash-can"></i>
+                            </a>
+                        </td>
+                    </tr>
+        
+                    {{else}}
+                        <tr class="no-data mt-5 text-center">
+                            <td colspan="7">Chưa có Review nào!!! 
+                                <a>
+                                    Hãy tạo ở phía trên.
+                                    <i class="fa-solid fa-arrow-up"></i>
+                                </a>
+                            </td>
+                        </tr>
+        
+                    {{/each}}
+                </tbody>
+            </table>
+    </div>
+</div>
+
+<form method="POST" name="delete-review-form"></form>
+
+{{!-- Confirm delete --}}
+<div class="modal fade" id="delete-review-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel">Xóa Review??</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          Bạn có chắc chắn xóa Review này??
+          Khi không khôi phục lại được.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-review" type="button" class="btn btn-danger">Xóa vĩnh viễn</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+
+        var reviewId;
+        var deleteForm = document.forms['delete-review-form'];
+        var btnDeletereView = document.getElementById('btn-delete-review');
+
+        $('#delete-review-modal').on('show.bs.modal',function(e) {
+            var button = $(e.relatedTarget);
+            reviewId= button.data('id');
+        });
+
+        btnDeletereView.onclick = function() {
+            deleteForm.action = "/reviews/" + reviewId + '/force?_method=DELETE';
+            deleteForm.submit();
+        }
+    })
+</script>

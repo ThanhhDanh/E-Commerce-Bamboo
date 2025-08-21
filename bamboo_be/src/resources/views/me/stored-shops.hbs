@@ -1,0 +1,156 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Chủ cửa hàng
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='container-fluid'>
+        <form name='container-form' method='POST' action='/shops/handle-form-actions'>
+            <div class='stored-products-header'>
+                <h1 class=''>Danh sách cửa hàng</h1>
+
+                <div class='row mt-5 align-items-center'>
+                    <div class='col-sm-12 col-md-8 col-lg-8'>
+                        <div class='d-flex align-items-center'>
+                            <a href='/me/trash/shops'>
+                                <i class='fa-regular fa-trash-can'></i>
+                                <span>{{deletedCount}}</span>
+                            </a>
+                            <select
+                                class='form-select w-50 mx-4'
+                                aria-label='Default select example'
+                                name='action'
+                                required
+                            >
+                                <option value=''>-- Chọn hành động --</option>
+                                <option value='delete'>Xóa</option>
+                            </select>
+                            <button class='btn btn-primary btn-lg disabled btn-check-all'>Thực hiện</button>
+                        </div>
+                    </div>
+                    <div class='col-sm-12 col-md-4 col-lg-4'>
+                        <form role='search'>
+                            <div class='form-input'>
+                                <i class='fa-solid fa-magnifying-glass'></i>
+                                <input
+                                    class='form-control me-2'
+                                    type='search'
+                                    placeholder='Search'
+                                    aria-label='Search'
+                                />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <table class='table mt-5'>
+                <thead>
+                    <tr>
+                        <th scope='col'>
+                            <input class='form-check-input' type='checkbox' value='' id='checkbox-all' />
+                        </th>
+                        <th scope='col'>
+                            #
+                            {{{sortable '_id' _sort}}}
+                        </th>
+                        <th scope='col'>Ảnh cửa hàng</th>
+                        <th scope='col'>
+                            Tên cửa hàng
+                        </th>
+                        <th scope='col'>Địa chỉ</th>
+                        <th scope='col'>Chủ cửa hàng</th>
+                        <th scope='col'>Loại cửa hàng</th>
+                        <th scope='col'>Thời gian tạo</th>
+                        <th scope='col'>#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each shops}}
+                        <tr>
+                            <td>
+                                <div>
+                                    <input
+                                        class='form-check-input'
+                                        type='checkbox'
+                                        name='shopIds[]'
+                                        value='{{this._id}}'
+                                    />
+                                </div>
+                            </td>
+
+                            <td>{{this._id}}</td>
+                            <td>
+                                <img class='table-img-shop' src={{this.image}} alt={{this.name}} />
+                            </td>
+                            <td>{{this.name}}</td>
+                            <td>{{this.address}}</td>
+                            <td>{{this.ownerId}}</td>
+                            <td>{{this.categoryId}}</td>
+                            <td>{{formatDate this.createdAt 'll'}}</td>
+                            <td>
+                                <div class='d-flex flex-column'>
+                                    <a href='/shops/{{this._id}}/edit' class='btn btn-info mb-4'>
+                                        <i class='fa-regular fa-pen-to-square'></i>
+                                    </a>
+                                    <a
+                                        href=''
+                                        class='btn btn-danger'
+                                        data-id='{{this._id}}'
+                                        data-bs-toggle='modal'
+                                        data-bs-target='#delete-shop-modal'
+                                    >
+                                        <i class='fa-regular fa-trash-can'></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                    {{else}}
+                        <tr>
+                            <td colspan='9' class='text-center'>Không có cửa hàng nào!!!.
+                                <a class='text-danger' href='/shops/create'>Tạo cửa hàng</a>
+                            </td>
+                        </tr>
+
+                    {{/each}}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+{{! Confirm delete }}
+<div class='modal fade' id='delete-shop-modal' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title' id='exampleModalLabel'>Xóa cửa hàng??</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                Bạn có chắc chắn xóa cửa hàng này!!!
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Hủy</button>
+                <button id='btn-delete-shop' type='button' class='btn btn-danger'>Xóa bỏ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! Delete form }}
+<form method='POST' name='delete-shop-form'></form>
+
+<script src='/js/stored-shops.js'></script>

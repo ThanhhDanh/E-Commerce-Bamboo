@@ -1,0 +1,280 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Danh sách hóa đơn
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='container-fluid'>
+        <h1 class='text-center mb-5'>Hóa đơn</h1>
+        <div class='row'>
+            <div class='col-xl-4 col-md-6'>
+                <div class='card bg-invoice-table text-white mb-4'>
+                    <div class='card-body'>
+                        <div class='card-body-invoice'>
+                            <div class='card-content'>
+                                <span class='card-data'>{{formatPrice totalSendedRevenue}}</span>
+                                <span class='card-unit'></span>
+                            </div>
+                            Hóa đơn gửi
+                            <div class='card-stats'>
+                                <span class='card-amount'>{{ordersSended}}</span>
+                                <span class='card-amount-unit'>Hóa đơn đã gửi</span>
+                            </div>
+                        </div>
+                        <div class='avatar-sm flex-shrink-0'>
+                            <span class='avatar-title bg-light rounded-circle'>
+                                <svg
+                                    fill='#000000'
+                                    width='28px'
+                                    height='28px'
+                                    viewBox='0 0 24 24'
+                                    id='invoice-dollar'
+                                    data-name='Line Color'
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    class='icon line-color'
+                                >
+                                    <g id='SVGRepo_bgCarrier' stroke-width='0'></g>
+                                    <g id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'></g>
+                                    <g id='SVGRepo_iconCarrier'>
+                                        <path
+                                            id='secondary'
+                                            d='M20,7H17.5A1.5,1.5,0,0,0,16,8.5h0A1.5,1.5,0,0,0,17.5,10h1A1.5,1.5,0,0,1,20,11.5h0A1.5,1.5,0,0,1,18.5,13H16'
+                                            style='fill: none; stroke: #b66dff; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;'
+                                        >
+                                        </path>
+                                        <path
+                                            id='secondary-2'
+                                            data-name='secondary'
+                                            d='M14,17H8m0-4h4m6-6V6m0,8V13'
+                                            style='fill: none; stroke: #b66dff; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;'
+                                        >
+                                        </path>
+                                        <path
+                                            id='primary'
+                                            d='M18,18v2a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V4A1,1,0,0,1,5,3H15'
+                                            style='fill: none; stroke: #b66dff; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;'
+                                        >
+                                        </path>
+                                    </g>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='col-xl-4 col-md-6'>
+                <div class='card bg-invoice-table text-white mb-4'>
+                    <div class='card-body'>
+                        <div class='card-body-invoice'>
+                            <div class='card-content'>
+                                <span class='card-data'>{{formatPrice totalPaidRevenue}}</span>
+                                <span class='card-unit'></span>
+                            </div>
+                            Hóa đơn đã trả
+                            <div class='card-stats'>
+                                <span class='card-amount'>{{ordersPaid}}</span>
+                                <span class='card-amount-unit'>Hóa đơn đã trả</span>
+                            </div>
+                        </div>
+                        <div class='avatar-sm flex-shrink-0'>
+                            <span class='avatar-title bg-light rounded-circle'>
+                                <svg
+                                    width='28px'
+                                    height='28px'
+                                    viewBox='0 0 32 32'
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    fill='#000000'
+                                >
+                                    <g id='SVGRepo_bgCarrier' stroke-width='0'></g>
+                                    <g id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'></g>
+                                    <g id='SVGRepo_iconCarrier'>
+                                        <g id='invoice_paid' transform='translate(-124 -248)'>
+                                            <rect
+                                                id='Rectangle_3'
+                                                data-name='Rectangle 3'
+                                                width='24'
+                                                height='24'
+                                                transform='translate(125 249)'
+                                                fill='none'
+                                                stroke='#b66dff'
+                                                stroke-linecap='round'
+                                                stroke-linejoin='round'
+                                                stroke-width='2'
+                                            ></rect>
+                                            <path
+                                                id='Path_26'
+                                                data-name='Path 26'
+                                                d='M131,273v6h24V255h-6'
+                                                fill='none'
+                                                stroke='#b66dff'
+                                                stroke-linecap='round'
+                                                stroke-linejoin='round'
+                                                stroke-width='2'
+                                            ></path>
+                                            <path
+                                                id='Path_27'
+                                                data-name='Path 27'
+                                                d='M144.039,256.5,134.5,266l-4.5-4.333'
+                                                fill='none'
+                                                stroke='#b66dff'
+                                                stroke-linecap='round'
+                                                stroke-linejoin='round'
+                                                stroke-width='2'
+                                            ></path>
+                                        </g>
+                                    </g>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='col-xl-4 col-md-6'>
+                <div class='card bg-invoice-table bg-invoice-tables-last mb-4'>
+                    <div class='card-body text-white'>
+                        <div class='card-body-invoice'>
+                            <div class='card-content'>
+                                <span class='card-data'>{{formatPrice totalCancelRevenue}}</span>
+                                <span class='card-unit'></span>
+                            </div>
+                            Hóa đơn đã hủy
+                            <div class='card-stats'>
+                                <span class='card-amount-cancel'>{{ordersCancel}}</span>
+                                <span class='card-amount-unit'>Hóa đơn đã hủy</span>
+                            </div>
+                        </div>
+                        <div class='avatar-sm flex-shrink-0'>
+                            <span class='avatar-title bg-light rounded-circle'>
+                                <svg
+                                    width='28px'
+                                    height='28px'
+                                    viewBox='0 0 1024 1024'
+                                    class='icon'
+                                    version='1.1'
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    fill='#000000'
+                                >
+                                    <g id='SVGRepo_bgCarrier' stroke-width='0'></g>
+                                    <g id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'></g>
+                                    <g id='SVGRepo_iconCarrier'>
+                                        <path
+                                            d='M731.15 584.74c-100.99 0-182.86 81.87-182.86 182.86s81.87 182.86 182.86 182.86 182.86-81.87 182.86-182.86-81.87-182.86-182.86-182.86z m0 292.57c-60.5 0-109.71-49.22-109.71-109.71 0-60.5 49.22-109.71 109.71-109.71 60.5 0 109.71 49.22 109.71 109.71 0.01 60.49-49.21 109.71-109.71 109.71z'
+                                            fill='#b66dff'
+                                        ></path>
+                                        <path
+                                            d='M657.76 740.16h146.29v54.86H657.76zM219.51 475.38h219.43v73.14H219.51z'
+                                            fill='#b66dff'
+                                        ></path>
+                                        <path
+                                            d='M182.61 366.27h585.62v179.48h73.14V145.62c0-39.96-32.5-72.48-72.46-72.48h-27.36c-29.2 0-55.05 16.73-65.88 42.59-5.71 13.61-27.84 13.64-33.55 0-10.86-25.88-36.71-42.59-65.89-42.59h-18.16c-29.2 0-55.05 16.73-65.88 42.59-5.71 13.61-27.84 13.64-33.55 0-10.86-25.88-36.71-42.59-65.89-42.59h-17.43c-29.2 0-55.05 16.73-65.88 42.59-5.71 13.61-27.84 13.64-33.55 0-10.86-25.88-36.71-42.59-65.89-42.59h-27.57c-39.96 0-72.48 32.52-72.48 72.48v805.12h401.21V877.6H183.04l-0.43-511.33zM208.42 144c14.27 34.07 47.32 56.09 84.23 56.09 36.89 0 69.95-22 82.66-53.8l15.86-2.29c14.27 34.07 47.32 56.09 84.23 56.09 36.89 0 69.95-22 82.66-53.8l16.59-2.29c14.27 34.07 47.32 56.09 84.23 56.09 36.89 0 69.95-22 82.66-53.8l26.68-0.66v147.5H182.54l-0.12-146.84 26-2.29z'
+                                            fill='#b66dff'
+                                        ></path>
+                                    </g>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='form-search'>
+            <form method='GET' action='' class='d-flex align-items-center justify-content-end form-inline'>
+                <input
+                    class='form-control w-25 me-3'
+                    name='name'
+                    type='search'
+                    placeholder='Tìm kiếm hóa đơn tên khách hàng....'
+                    aria-label='Search'
+                    required
+                />
+                <button class='btn' type='submit'>Tìm kiếm</button>
+            </form>
+        </div>
+        <div class='card menu-invoices mb-4'>
+            <div class='card-header'>
+                <i class='fas fa-table me-1'></i>
+                Hóa đơn khách hàng
+            </div>
+            <div class='card-body card-table'>
+                <table class='table text-center'>
+                    <thead>
+                        <tr>
+                            <th>
+
+                                #
+                            </th>
+                            <th>Ảnh</th>
+                            <th>
+
+                                Tên
+                            </th>
+                            <th>SĐT</th>
+                            <th>Ngày lên đơn</th>
+                            <th>Trạng thái</th>
+                            <th>Tổng tiền</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>#</th>
+                            <th>Ảnh</th>
+                            <th>Tên</th>
+                            <th>SĐT</th>
+                            <th>Ngày lên đơn</th>
+                            <th>Trạng thái</th>
+                            <th>Tổng tiền</th>
+                            <th>#</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        {{#each orders}}
+                            <tr>
+                                <td>{{this._id}}</td>
+                                <td style='width: 150px;'><img
+                                        style='width: 60px; height: 60px;'
+                                        src='{{this.userId.avatar}}'
+                                        alt='{{this.userId.firstName}}'
+                                    /></td>
+                                <td>{{this.userId.firstName}}</td>
+                                <td>{{this.userId.phone}}</td>
+                                <td>{{formatDate this.createdAt 'll'}}</td>
+                                <td>
+                                    <div class='status {{checkStatus this.status}}'>{{this.status}}</div>
+                                </td>
+                                <td>{{formatPrice this.totalAmount}}</td>
+                                <td>
+                                    <a href='/orders/detail/{{this.slug}}' class='btn-action'>
+                                        <i class='mdi mdi-eye'></i>
+                                    </a>
+                                    <a href='/orders/edit/{{this._id}}' class='btn-action'>
+                                        <i class='mdi mdi-pencil'></i>
+                                    </a>
+                                    <a class='btn-action' onclick='deleteOrder({{this._id}})'>
+                                        <i class='mdi mdi-delete'></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+
+                </table>
+                <!-- Phân trang -->
+                <div class='paginate d-flex justify-content-center my-2'>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

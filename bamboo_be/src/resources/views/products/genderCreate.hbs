@@ -1,0 +1,130 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Phụ kiện sản phẩm
+        </h3>
+        <nav>
+            <ul class='breadcrumb menu-breadcrumb'>
+                <li class='breadcrumb-item {{isActive currentPath "/products/gender/create"}}'><a
+                        href='/products/gender/create'
+                    >Giới tính</a></li>
+                <li class='breadcrumb-item mx-3 {{isActive currentPath "/products/size/create"}}'><a
+                        href='/products/size/create'
+                    >Kích thước</a></li>
+                <li class='breadcrumb-item {{isActive currentPath "/products/color/create"}}'><a
+                        href='/products/color/create'
+                    >Màu sắc</a></li>
+            </ul>
+        </nav>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='container'>
+        <h1 class='text-center'>Giới tính sản phẩm</h1>
+        <form method='POST' action='/products/gender/store'>
+            <div class='row'>
+                <div class='col-sm-12 col-md-12 col-lg-12'>
+                    <div class='mb-3'>
+                        <label for='name' class='form-label'>Giới tính sản phẩm</label>
+                        <input
+                            type='text'
+                            class='form-control'
+                            id='name'
+                            value='{{oldData.name}}'
+                            name='name'
+                            placeholder='Name...'
+                        />
+                        {{{validateInput errors 'name'}}}
+                    </div>
+                </div>
+            </div>
+            <button type='submit' class='btn btn-success btn-lg'>Thêm giới tính</button>
+        </form>
+    </div>
+
+    <div class='container mt-5'>
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th scope='col'>
+                        #
+                    </th>
+                    <th scope='col'>
+                        Giới tính sản phẩm
+                    </th>
+                    <th scope='col'>Thời gian tạo</th>
+                    <th scope='col'>#</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each genders}}
+                    <tr>
+                        <td>{{this._id}}</td>
+                        <td>{{this.name}}</td>
+                        <td>{{formatDate this.createdAt 'll'}}</td>
+                        <td class='d-flex flex-column'>
+                            <a
+                                href=''
+                                class='btn btn-danger'
+                                data-id='{{this._id}}'
+                                data-bs-toggle='modal'
+                                data-bs-target='#delete-gender-modal'
+                            >
+                                <i class='fa-regular fa-trash-can'></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                {{else}}
+                    <tr class='no-data mt-5 text-center'>
+                        <td colspan='5'>Chưa có danh sách giới tính nào!!!
+                            <a>
+                                Hãy tạo ở phía trên.
+                                <i class='fa-solid fa-arrow-up'></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form method='POST' name='delete-gender-form'></form>
+
+{{! Confirm delete }}
+<div class='modal fade' id='delete-gender-modal' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title' id='exampleModalLabel'>Xóa giới tính??</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                Bạn có chắc chắn xóa giới tính này?? Khi không khôi phục lại được.
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Hủy</button>
+                <button id='btn-delete-gender' type='button' class='btn btn-danger'>Xóa vĩnh viễn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){ var genderId; var deleteForm =
+    document.forms['delete-gender-form']; var btnDeleteGender = document.getElementById('btn-delete-gender');
+    $('#delete-gender-modal').on('show.bs.modal',function(e) { var button = $(e.relatedTarget); genderId=
+    button.data('id'); }); btnDeleteGender.onclick = function() { deleteForm.action = "/products/gender/" + genderId +
+    '/force?_method=DELETE'; deleteForm.submit(); } })
+</script>

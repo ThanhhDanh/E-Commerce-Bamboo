@@ -1,0 +1,146 @@
+<div class="content-wrapper">
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Sản phẩm
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="container">
+        <h1 class="text-center">Đăng sản phẩm</h1>
+        <form method="POST" action="/products/store" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Ảnh sản phẩm</label>
+                        <input type="file" class="form-control" id="image" value="{{oldData.image}}" name="image" placeholder="Image..." >
+                        {{{validateInput errors "image"}}}
+                    </div>
+                    <div class="show-img">
+                        <img src="/img/default-image.webp" alt="">
+                    </div>
+                </div>
+
+                 <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Mô tả sản phẩm</label>
+                        <textarea class="form-description" id="description" rows="20" name="description" placeholder="Description..." rows="4" cols="50">{{oldData.description}}</textarea>
+                        {{{validateInput errors "description"}}}
+                    </div>
+                </div>
+    
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Tên sản phẩm</label>
+                        <input type="text" class="form-control value="{{oldData.name}}"" id="name" name="name" placeholder="Name..." >
+                        {{{validateInput errors "name"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Giá sản phẩm</label>
+                        <input type="text" class="form-control" id="price" value="{{oldData.price}}" name="price" placeholder="Price..." >
+                        {{{validateInput errors "price"}}}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
+                        <label for="userId" class="form-label">Chủ của sản phẩm</label>
+                        <select class="form-control" id="userId" name="userId">
+                            <option value="">-- Chủ shop của sản phẩm --</option>
+                            {{#each users}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.userId)}}selected{{/if}}>
+                                    {{this.firstName}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "userId"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="genderId" class="form-label">Giới tính sản phẩm</label>
+                        <select class="form-control" id="genderId" name="genderId">
+                            <option value="">-- Chọn giới tính sản phẩm --</option>
+                            {{#each genders}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.genderId)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "gender"}}}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
+                        <label for="categoryId" class="form-label">Loại sản phẩm</label>
+                        <select class="form-control" id="categoryId" name="categoryId">
+                            <option value="">-- Chọn loại sản phẩm --</option>
+                            {{#each categories}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.categoryId)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "categoryId"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="shopId" class="form-label">Cửa hàng cho sản phẩm</label>
+                        <select class="form-control" id="shopId" name="shopId">
+                            <option value="">-- Chọn cửa hàng cho sản phẩm --</option>
+                            {{#each shops}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.shopId)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "shopId"}}}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
+                        <label for="sizeId" class="form-label">Kích thước sản phẩm</label>
+                        <select class="form-control select2" id="sizeId" name="sizeId[]" multiple data-live-search="true">
+                            <option value="">-- Chọn kích thước sản phẩm --</option>
+                            {{#each sizes}}
+                                <option value="{{this._id}}" {{#if (arrayContains ../oldData.sizeId this._id)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "sizeId"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="colorId" class="form-label">Màu sản phẩm</label>
+                        <select class="form-control select2" id="colorId" name="colorId[]" multiple data-live-search="true">
+                            <option value="">-- Chọn màu sản phẩm --</option>
+                            {{#each colors}}
+                                <option value="{{this._id}}" {{#if (arrayContains ../oldData.colorId this._id)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "colorId"}}}
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-lg">Thêm sản phẩm</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: '-- Chọn --', 
+                allowClear: true,
+            });
+        });
+    })
+</script>

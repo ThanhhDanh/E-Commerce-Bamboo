@@ -1,0 +1,108 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Chỉnh sửa sản phẩm
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='mt-4'>
+        <h3>Cập nhật sản phẩm</h3>
+        <form class='mt-4' method='POST' action='/products/{{product._id}}?_method=PUT' enctype='multipart/form-data'>
+            <div class='mb-3'>
+                <label for='name' class='form-label'>Tên sản phẩm</label>
+                <input
+                    type='text'
+                    value='{{product.name}}'
+                    class='form-control'
+                    id='name'
+                    name='name'
+                    placeholder='Name...'
+                />
+            </div>
+            <div class='mb-3'>
+                <label for='image' class='form-label'>Ảnh sản phẩm</label>
+                <div class='mb-2 edit-img'>
+                    <img src='{{product.image}}' alt='Ảnh sản phẩm' />
+                </div>
+                <input type='file' class='form-control' id='image' name='image' />
+            </div>
+            <div class='mb-3'>
+                <label for='description' class='form-label'>Mô tả sản phẩm</label>
+                <textarea
+                    class='form-control'
+                    rows='20'
+                    id='description'
+                    name='description'
+                >{{product.description}}</textarea>
+            </div>
+            <div class='mb-3'>
+                <label for='price' class='form-label'>Giá sản phẩm</label>
+                <input
+                    type='text'
+                    value='{{product.price}}'
+                    class='form-control'
+                    id='price'
+                    name='price'
+                    placeholder='Price...'
+                />
+            </div>
+            <div class='mb-3'>
+                <label for='gender' class='form-label'>Giới tính sản phẩm</label>
+                <input
+                    type='text'
+                    value='{{product.genderId}}'
+                    class='form-control'
+                    id='gender'
+                    name='gender'
+                    placeholder='Gender...'
+                />
+            </div>
+            <div class="mb-3">
+                <label for="sizeId" class="form-label">Kích thước sản phẩm</label>
+                <select class="form-control select2" id="sizeId" name="sizeIds[]" multiple>
+                    <option value="">-- Chọn kích thước sản phẩm --</option>
+                     {{#each sizes}}
+                        <option value="{{this._id}}" {{arrayContains ../product.sizeIds this._id}}>
+                            {{this.name}}
+                        </option>
+                    {{/each}}
+                </select>
+                {{{validateInput errors "sizeId"}}}
+            </div>
+            <div class="mb-3">
+                <label for="colorId" class="form-label">Màu sản phẩm</label>
+                <select class="form-control select2" id="colorId" name="colorIds[]" multiple>
+                    <option value="">-- Chọn màu sản phẩm --</option>
+                    {{#each colors}}
+                        <option value="{{this._id}}" {{arrayContains ../product.colorIds this._id}}>
+                            {{this.name}}
+                        </option>
+                    {{/each}}
+                </select>
+                {{{validateInput errors "colorId"}}}
+            </div>
+            <button type='submit' class='btn btn-primary'>Lưu sản phẩm</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: '-- Chọn --', 
+                allowClear: true,
+            });
+        });
+    })
+</script>

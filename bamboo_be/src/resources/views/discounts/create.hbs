@@ -1,0 +1,159 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Phiếu giảm giá
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='container'>
+        <h1 class='text-center'>Danh sách phiếu giảm giá</h1>
+        <form method='POST' action='/discounts/store'>
+            <div class='row'>
+                <div class='col-sm-12 col-md-12 col-lg-12'>
+                    <div class='mb-3'>
+                        <label for='name' class='form-label'>Tên phiếu giảm giá</label>
+                        <input
+                            type='text'
+                            class='form-control'
+                            id='name'
+                            name='name'
+                            value='{{oldData.name}}'
+                            placeholder='Name...'
+                        />
+                        {{{validateInput errors 'name'}}}
+                    </div>
+                    <div class='mb-3'>
+                        <label for='description' class='form-label'>Mô tả phiếu giảm giá</label>
+                        <textarea
+                            class='form-description'
+                            id='description'
+                            name='description'
+                            placeholder='Description...'
+                            rows='2'
+                            cols='50'
+                        >{{oldData.description}}</textarea>
+                        {{{validateInput errors 'description'}}}
+                    </div>
+                    <div class='mb-3'>
+                        <label for='price' class='form-label'>Giá % giảm</label>
+                        <input
+                            type='text'
+                            class='form-control'
+                            id='price'
+                            name='price'
+                            value='{{oldData.price}}'
+                            placeholder='Price...'
+                        />
+                        {{{validateInput errors 'price'}}}
+                    </div>
+                    <div class='mb-3'>
+                        <label for='amount' class='form-label'>Số lượng giảm giá</label>
+                        <input
+                            type='text'
+                            class='form-control'
+                            id='amount'
+                            name='amount'
+                            value='{{oldData.amount}}'
+                            placeholder='Amount...'
+                        />
+                        {{{validateInput errors 'amount'}}}
+                    </div>
+                </div>
+            </div>
+            <button type='submit' class='btn btn-success btn-lg'>Tạo phiếu giảm giá</button>
+        </form>
+    </div>
+
+    <div class='container mt-5'>
+        <table class='table table-hover'>
+            <thead>
+                <tr>
+                    <th scope='col'>
+                        #
+                    </th>
+                    <th scope='col'>Tên phiếu giảm giá</th>
+                    <th scope='col'>Mô tả phiếu giảm giá</th>
+                    <th scope='col'>Giá % giảm</th>
+                    <th scope='col'>Thời gian hết hạn</th>
+                    <th scope='col'>Số lượng phiếu giảm giá</th>
+                    <th scope='col'>Thời gian tạo</th>
+                    <th scope='col'>#</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each discounts}}
+                    <tr>
+                        <td>{{this._id}}</td>
+                        <td>{{this.name}}</td>
+                        <td>{{this.description}}</td>
+                        <td>{{formatPrice this.price}}</td>
+                        <td>{{formatDate this.expirateTime 'll'}}</td>
+                        <td>{{this.amount}}</td>
+                        <td>{{formatDate this.createdAt 'll'}}</td>
+                        <td class='d-flex flex-column'>
+                            <a
+                                href=''
+                                class='btn btn-danger'
+                                data-id='{{this._id}}'
+                                data-bs-toggle='modal'
+                                data-bs-target='#delete-discount-modal'
+                            >
+                                <i class='fa-regular fa-trash-can'></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                {{else}}
+                    <tr class='no-data mt-5 text-center'>
+                        <td colspan='8'>Chưa có phiếu giảm giá nào!!!
+                            <a>
+                                Hãy tạo ở phía trên.
+                                <i class='fa-solid fa-arrow-up'></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form method='POST' name='delete-discount-form'></form>
+
+{{! Confirm delete }}
+<div class='modal fade' id='delete-discount-modal' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title' id='exampleModalLabel'>Xóa phiếu giảm giá??</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                Bạn có chắc chắn xóa phiếu giảm giá này?? Khi không khôi phục lại được.
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Hủy</button>
+                <button id='btn-delete-discount' type='button' class='btn btn-danger'>Xóa vĩnh viễn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){ var discountId; var deleteForm =
+    document.forms['delete-discount-form']; var btnDeleteDiscount = document.getElementById('btn-delete-discount');
+    $('#delete-discount-modal').on('show.bs.modal',function(e) { var button = $(e.relatedTarget); discountId=
+    button.data('id'); }); btnDeleteDiscount.onclick = function() { deleteForm.action = "/discounts/" + discountId +
+    '/force?_method=DELETE'; deleteForm.submit(); } })
+</script>

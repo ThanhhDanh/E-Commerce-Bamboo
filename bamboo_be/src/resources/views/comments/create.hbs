@@ -1,0 +1,181 @@
+<div class="content-wrapper">
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Bình luận
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="container">
+        <h1 class="text-center">Danh sách bình luận</h1>
+        <a class="trash" href="/comments/trash/comment">
+            <i class="fa-regular fa-trash-can"></i>
+            <span>{{deletedCount}}</span>
+        </a>
+        <form method="POST" action="/comments/store">
+            <div class="row mt-5">
+                <div class="col-12">
+
+                    <!-- Nội dung bình luận -->
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Bình luận</label>
+                        <textarea class="form-control" id="content" name="content" placeholder="Nội dung..." rows="2">{{oldData.content}}</textarea>
+                        {{{validateInput errors "content"}}}
+                    </div>
+
+                    <!-- Sản phẩm -->
+                    <div class="mb-3">
+                        <label for="productId" class="form-label">Sản phẩm</label>
+                        <select class="form-control" id="productId" name="productId">
+                            <option value="">-- Chọn sản phẩm --</option>
+                            {{#each products}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.productId)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "productId"}}}
+                    </div>
+
+                    <!-- Người bình luận -->
+                    <div class="mb-3">
+                        <label for="userId" class="form-label">Người bình luận</label>
+                        <select class="form-control" id="userId" name="userId">
+                            <option value="">-- Chọn người dùng --</option>
+                            {{#each users}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.userId)}}selected{{/if}}>
+                                    {{this.firstName}} (ID: {{this._id}})
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "userId"}}}
+                    </div>
+
+                    <!-- Vai trò -->
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Vai trò</label>
+                        <select class="form-control" id="role" name="role">
+                            <option value="user" {{#if (eq oldData.role "user")}}selected{{/if}}>Khách hàng</option>
+                            <option value="staff" {{#if (eq oldData.role "staff")}}selected{{/if}}>Nhân viên</option>
+                        </select>
+                        {{{validateInput errors "role"}}}
+                    </div>
+
+                    <!-- Bình luận cha (nếu là trả lời) -->
+                    <div class="mb-3">
+                        <label for="parentId" class="form-label">Trả lời bình luận</label>
+                        <select class="form-control" id="parentId" name="parentId">
+                            <option value="">-- Không trả lời (bình luận gốc) --</option>
+                            {{#each comments}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.parentId)}}selected{{/if}}>
+                                    {{this.content}} (ID: {{this._id}})
+                                </option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg">Tạo bình luận</button>
+        </form>
+
+    </div>
+    
+    <div class="container mt-5">
+        <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                          #
+                        </th>
+                        <th scope="col">Bình luận</th>
+                        <th scope="col">Sản phẩm bình luận</th>
+                        <th scope="col">Người dùng bình luận</th>
+                        <th scope="col">Thời gian tạo</th>
+                        <th scope="col">#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each comments}}
+                    <tr>
+                        <td>{{this._id}}</td>
+                        <td>{{this.content}}</td>
+                        <td>{{this.productId}}</td>
+                        <td>{{this.userId}}</td>
+                        <td>{{formatDate this.createdAt 'll'}}</td>
+                        <td class="d-flex flex-column">
+                            <a href="" class="btn btn-danger" data-id="{{this._id}}" data-bs-toggle="modal" data-bs-target="#delete-comment-modal">
+                              <i class="fa-regular fa-trash-can"></i>
+                            </a>
+                        </td>
+                    </tr>
+        
+                    {{else}}
+                        <tr class="no-data mt-5 text-center">
+                            <td colspan="6">Chưa có bình luận sản phẩm nào!!! 
+                                <a>
+                                    Hãy tạo ở phía trên.
+                                    <i class="fa-solid fa-arrow-up"></i>
+                                </a>
+                            </td>
+                        </tr>
+        
+                    {{/each}}
+                </tbody>
+            </table>
+    </div>
+</div>
+
+<form method="POST" name="delete-comment-form"></form>
+
+{{!-- Confirm delete --}}
+<div class="modal fade" id="delete-comment-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel">Xóa bình luận??</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          Bạn có chắc chắn xóa bình luận này??
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-comment" type="button" class="btn btn-danger">Xóa tạm thời</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Delete form --}}
+<form method="POST" name="delete-comment-form"></form>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function(){
+
+    var commentId;
+    var deleteForm = document.forms['delete-comment-form'];
+    var btnDeleteComment = document.getElementById('btn-delete-comment');
+
+    $('#delete-comment-modal').on('show.bs.modal',function(e) {
+      var button = $(e.relatedTarget);
+      commentId= button.data('id');
+    });
+
+    btnDeleteComment.onclick = function() {
+      deleteForm.action = "/comments/" + commentId + '?_method=DELETE';
+      deleteForm.submit();
+    }
+
+  });
+
+</script>

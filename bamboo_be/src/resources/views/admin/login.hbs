@@ -1,0 +1,28 @@
+<div class='auth-container'>
+    <div class='form-container'>
+        <h2>Đăng nhập</h2>
+        <form id='loginForm'>
+            <div class='form-group'>
+                <label for='name'>Email:</label>
+                <input type='text' id='name' name='email' placeholder='Nhập tài khoản...' required autocomplete='off' />
+            </div>
+            <div class='form-group'>
+                <label for='password'>Mật khẩu:</label>
+                <input type='password' name='password' id='password' placeholder='Mật khẩu...' required />
+            </div>
+            <button type='submit' class='submit-btn'>Đăng nhập</button>
+        </form>
+        <p>Không có tài khoản? <a href='/register'>Đăng ký</a></p>
+    </div>
+</div>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", async function (event) { event.preventDefault();
+    const email = document.getElementById("name").value; const password = document.getElementById("password").value; try
+    { const response = await fetch("/login", { method: "POST", headers: { "Content-Type": "application/json" }, body:
+    JSON.stringify({ email, password }) }); const result = await response.json(); console.log("Kết quả đăng nhập:",
+    result); if (response.ok) { localStorage.setItem("loggedIn", "true"); // Lưu trạng thái đăng nhập
+    window.location.href = "/home"; } else { alert(result.message); } } catch (error) { console.error("Lỗi đăng nhập:",
+    error); } });
+
+</script>

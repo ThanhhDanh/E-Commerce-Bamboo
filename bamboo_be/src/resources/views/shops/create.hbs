@@ -1,0 +1,85 @@
+<div class="content-wrapper">
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Cửa hàng
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="container">
+        <h1 class="text-center">Tạo cửa hàng</h1>
+        <form method="POST" action="/shops/store" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Ảnh cửa hàng</label>
+                        <input type="file" class="form-control" id="image" value="{{oldData.image}}" name="image" placeholder="Ảnh cửa hàng..." >
+                        {{{validateInput errors "image"}}}
+                    </div>
+                    <div class="show-img">
+                        <img src="/img/default-image.webp" alt="">
+                    </div>
+                </div>
+    
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Tên cửa hàng</label>
+                        <input type="text" class="form-control value="{{oldData.name}}"" id="name" name="name" placeholder="Tên cửa hàng..." >
+                        {{{validateInput errors "name"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Địa chỉ cửa hàng</label>
+                        <input type="text" class="form-control" id="address" value="{{oldData.address}}" name="address" placeholder="Địa chỉ..." >
+                        {{{validateInput errors "address"}}}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                        <label for="ownerId" class="form-label">Chủ cửa hàng</label>
+                        <select class="form-control" id="ownerId" name="ownerId">
+                            <option value="">-- Chọn chủ cửa hàng --</option>
+                            {{#each users}}
+                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.ownerId)}}selected{{/if}}>
+                                    {{this.firstName}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "ownerId"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="categoryId" class="form-label">Loại cửa hàng</label>
+                        <select class="form-control select2" id="categoryId" name="categoryId[]" multiple data-live-search="true">
+                            <option value="">-- Chọn loại cửa hàng --</option>
+                            {{#each categories}}
+                                <option value="{{this._id}}" {{#if (arrayContains ../oldData.categoryId this._id)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "categoryId"}}}
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-lg">Tạo cửa hàng</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $(document).ready(function() {
+            $('.select2').select2({
+                allowClear: true,
+            });
+        });
+    })
+</script>

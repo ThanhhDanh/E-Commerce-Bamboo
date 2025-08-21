@@ -1,0 +1,17 @@
+{
+  "header": {
+    "home": "Home",
+    "shop": "Shop",
+    "shopCategory": "Shop Category",
+    "productDetails": "Product Details",
+    "productCheckout": "Product Checkout",
+    "shoppingCart": "Shopping Cart",
+    "confirmation": "Confirmation",
+    "contact": "Contact",
+    "login": "Login",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings",
+    "searchPlaceholder": "Search for products"
+  }
+}

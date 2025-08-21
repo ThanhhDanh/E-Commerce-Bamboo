@@ -1,0 +1,17 @@
+{
+  "header": {
+    "home": "Trang chủ",
+    "shop": "Cửa hàng",
+    "shopCategory": "Danh mục sản phẩm",
+    "productDetails": "Chi tiết sản phẩm",
+    "productCheckout": "Thanh toán",
+    "shoppingCart": "Giỏ hàng",
+    "confirmation": "Xác nhận",
+    "contact": "Liên hệ",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "profile": "Trang cá nhân",
+    "settings": "Cài đặt",
+    "searchPlaceholder": "Tìm kiếm sản phẩm"
+  }
+}

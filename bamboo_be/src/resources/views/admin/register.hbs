@@ -1,0 +1,80 @@
+<div class="auth-container">
+    <div class="form-container">
+        <h2>Đăng ký</h2>
+        <form action="/create" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="avatar">Ảnh:</label>
+                <input type="file" name="avatar" id="avatar" placeholder="Ảnh người dùng..." required>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="form-group me-3">
+                    <label for="lastName">Họ:</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Nhập họ của bạn..." required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="firstName">Tên:</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="Nhập tên của bạn..." required autocomplete="off">
+                </div>
+            </div>
+             <div class="form-group">
+                <label for="address">Địa chỉ:</label>
+                <input type="text" id="address" name="address" placeholder="Nhập địa chỉ của bạn..." required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="phone">Số điện thoại:</label>
+                <input type="text" id="phone" name="phone" placeholder="Nhập số điện thoại của bạn..." required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <div class="form-email">
+                    <input type="text" id="email" name="email" placeholder="Nhập email của bạn..." required autocomplete="off">
+                    <i class="fa-solid fa-circle-exclamation" id="emailError"></i>
+                    <i class="fa-solid fa-check" id="emailSuccess"></i>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <div class="form-password">
+                    <input type="password" name="password" id="password" placeholder="Mật khẩu..." required>
+                    <i class="fa fa-eye-slash toggle-password" id="togglePassword"></i>
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">Đăng ký</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            let passwordInput = document.getElementById("password");
+            let icon = this;
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            } else {
+                passwordInput.type = "password";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            }
+        });
+
+        document.getElementById("email").addEventListener("input", function () {
+            let emailInput = this.value;
+            let emailError = document.getElementById("emailError");
+            let emailSuccess = document.getElementById("emailSuccess");
+            let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex kiểm tra email
+
+            if (!emailRegex.test(emailInput)) {
+                emailSuccess.style.display = "none";
+                emailError.style.display = "block";
+            } else {
+                emailError.style.display = "none";
+                emailSuccess.style.display = "block";
+            }
+        });
+    });
+    
+</script>

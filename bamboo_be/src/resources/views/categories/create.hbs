@@ -1,0 +1,124 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Danh mục
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='container'>
+        <h1 class='text-center'>Mục lục sản phẩm</h1>
+        <form method='POST' action='/categories/store'>
+            <div class='row'>
+                <div class='col-sm-12 col-md-12 col-lg-12'>
+                    <div class='mb-3'>
+                        <label for='name' class='form-label'>Tên mục lục</label>
+                        <input
+                            type='text'
+                            autocomplete='name'
+                            class='form-control'
+                            id='name'
+                            name='name'
+                            value='{{oldData.name}}'
+                            placeholder='Tên danh mục...'
+                        />
+                        {{{validateInput errors 'name'}}}
+                    </div>
+                </div>
+            </div>
+            <button type='submit' class='btn btn-success btn-lg'>Thêm mục lục</button>
+        </form>
+    </div>
+
+    <div class='container mt-5'>
+        <table class='table table-hover'>
+            <thead>
+                <tr>
+                    <th scope='col'>
+                        #
+                    </th>
+                    <th scope='col'>
+                        Tên danh mục
+                    </th>
+                    <th scope='col'>Thời gian tạo</th>
+                    <th scope='col'>#</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each categories}}
+                    <tr>
+                        <td>{{this._id}}</td>
+                        <td>{{this.name}}</td>
+                        <td>{{formatDate this.createdAt 'll'}}</td>
+                        <td>
+                            <a
+                                href=''
+                                class='btn btn-danger'
+                                data-id='{{this._id}}'
+                                data-bs-toggle='modal'
+                                data-bs-target='#delete-category-modal'
+                            >
+                                <i class='fa-regular fa-trash-can'></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                {{else}}
+                    <tr class='no-data mt-5 text-center'>
+                        <td colspan='5'>Chưa có danh mục nào!!!
+                            <a>
+                                Hãy tạo ở phía trên.
+                                <i class='fa-solid fa-arrow-up'></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <form method='POST' name='delete-category-form'></form>
+
+    {{! Confirm delete }}
+    <div
+        class='modal fade'
+        id='delete-category-modal'
+        tabindex='-1'
+        aria-labelledby='exampleModalLabel'
+        aria-hidden='true'
+    >
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h1 class='modal-title' id='exampleModalLabel'>Xóa danh mục??</h1>
+                    <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                </div>
+                <div class='modal-body'>
+                    Bạn có chắc chắn xóa danh mục này?? Khi không khôi phục lại được.
+                </div>
+                <div class='modal-footer'>
+                    <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Hủy</button>
+                    <button id='btn-delete-category' type='button' class='btn btn-danger'>Xóa vĩnh viễn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){ var categoryId; var deleteForm =
+        document.forms['delete-category-form']; var btnDeleteCategory = document.getElementById('btn-delete-category');
+        $('#delete-category-modal').on('show.bs.modal',function(e) { var button = $(e.relatedTarget); categoryId=
+        button.data('id'); }); btnDeleteCategory.onclick = function() { deleteForm.action = "/categories/" + categoryId
+        + '/force?_method=DELETE'; deleteForm.submit(); } })
+    </script>
+</div>

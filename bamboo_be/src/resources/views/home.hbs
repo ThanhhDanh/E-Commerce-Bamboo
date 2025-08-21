@@ -1,0 +1,150 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Dashboard
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='row'>
+        <div class='col-md-4 stretch-card grid-margin'>
+            <div class='card bg-gradient-danger card-img-holder text-white'>
+                <div class='card-body'>
+                    <img src='/images/dashboard/circle.svg' class='card-img-absolute' alt='circle-image' />
+                    <h4 class='font-weight-normal mb-3'>Doanh thu tuần
+                        <i class='mdi mdi-chart-line mdi-24px float-end'></i>
+                    </h4>
+                    <h2 class='mb-5'>{{formatPrice totalRevenue}}</h2>
+                    {{#with revenueStats}}
+                        {{#if isEqual}}
+                            <h6 class='card-text'>Không thay đổi</h6>
+                        {{else if isIncrease}}
+                            <h6 class='card-text'>Tăng khoảng {{value}} %</h6>
+                        {{else}}
+                            <h6 class='card-text'>Giảm khoảng {{value}} %</h6>
+                        {{/if}}
+                    {{/with}}
+                </div>
+            </div>
+        </div>
+        <div class='col-md-4 stretch-card grid-margin'>
+            <div class='card bg-gradient-info card-img-holder text-white'>
+                <div class='card-body'>
+                    <img src='/images/dashboard/circle.svg' class='card-img-absolute' alt='circle-image' />
+                    <h4 class='font-weight-normal mb-3'>Đơn hàng tuần
+                        <i class='mdi mdi-bookmark-outline mdi-24px float-end'></i>
+                    </h4>
+                    <h2 class='mb-5'>{{countOrders}}</h2>
+                    {{#with orderStats}}
+                        {{#if isEqual}}
+                            <h6 class='card-text'>Không thay đổi</h6>
+                        {{else if isIncrease}}
+                            <h6 class='card-text'>Tăng khoảng {{value}} %</h6>
+                        {{else}}
+                            <h6 class='card-text'>Giảm khoảng {{value}} %</h6>
+                        {{/if}}
+                    {{/with}}
+                </div>
+            </div>
+        </div>
+        <div class='col-md-4 stretch-card grid-margin'>
+            <div class='card bg-gradient-success card-img-holder text-white'>
+                <div class='card-body'>
+                    <img src='/images/dashboard/circle.svg' class='card-img-absolute' alt='circle-image' />
+                    <h4 class='font-weight-normal mb-3'>Khách hàng
+                        <i class='mdi mdi-diamond mdi-24px float-end'></i>
+                    </h4>
+                    <h2 class='mb-5'>{{countCustomers}}</h2>
+                    {{#with customerStats}}
+                        {{#if isEqual}}
+                            <h6 class='card-text'>Không thay đổi</h6>
+                        {{else if isIncrease}}
+                            <h6 class='card-text'>Tăng khoảng {{value}} %</h6>
+                        {{else}}
+                            <h6 class='card-text'>Giảm khoảng {{value}} %</h6>
+                        {{/if}}
+                    {{/with}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-md-7 grid-margin stretch-card'>
+            <div class='card'>
+                <div class='card-body'>
+                    <div class='clearfix'>
+                        <h4 class='card-title float-start'>Doanh thu tuần</h4>
+                        <div
+                            id='visit-sale-chart-legend'
+                            class='rounded-legend legend-horizontal legend-top-right float-end'
+                        ></div>
+                    </div>
+                    <canvas id='visit-sale-chart' data-weekly-revenue='{{{weeklyRevenueJSON}}}' class='mt-4'></canvas>
+                </div>
+            </div>
+        </div>
+        <div class='col-md-5 grid-margin stretch-card'>
+            <div class='card'>
+                <div class='card-body'>
+                    <h4 class='card-title'>Traffic Sources</h4>
+                    <div class='doughnutjs-wrapper d-flex justify-content-center'>
+                        <canvas id='traffic-chart'></canvas>
+                    </div>
+                    <div id='traffic-chart-legend' class='rounded-legend legend-vertical legend-bottom-left pt-4'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-12 grid-margin'>
+            <div class='card'>
+                <div class='card-body'>
+                    <h4 class='card-title'>Danh sách khách hàng</h4>
+                    <div class='table-responsive'>
+                        <table class='table'>
+                            <thead>
+                                <tr>
+                                    <th> Ảnh </th>
+                                    <th> Họ tên </th>
+                                    <th> Số điện thoại </th>
+                                    <th> Ngày tạo </th>
+                                    <th> ### </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each AllUsers}}
+                                    <tr>
+                                        <td>
+                                            <img
+                                                src='{{this.avatar}}'
+                                                class='home-avatar me-2'
+                                                alt='{{this.firstName}}'
+                                            />
+                                        </td>
+                                        <td>{{this.lastName}} {{this.firstName}}</td>
+                                        <td>
+                                            {{this.phone}}
+                                        </td>
+                                        <td> {{formatDate this.createdAt 'll'}} </td>
+                                        <td>
+                                            <i class='fa-regular fa-eye'></i>
+                                        </td>
+                                    </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

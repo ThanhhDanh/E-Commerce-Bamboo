@@ -1,0 +1,156 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Sản phẩm người dùng
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='container-fluid'>
+        <form name='container-form' method='POST' action='/products/handle-form-actions'>
+            <div class='stored-products-header'>
+                <h1 class='pt-5'>Danh sách sản phẩm</h1>
+
+                <div class='row mt-5 align-items-center'>
+                    <div class='col-sm-12 col-md-8 col-lg-8'>
+                        <div class='d-flex align-items-center'>
+                            <a href='/me/trash/products'>
+                                <i class='fa-regular fa-trash-can'></i>
+                                <span>{{deletedCount}}</span>
+                            </a>
+                            <select
+                                class='form-select w-50 mx-4'
+                                aria-label='Default select example'
+                                name='action'
+                                required
+                            >
+                                <option value=''>-- Chọn hành động --</option>
+                                <option value='delete'>Xóa</option>
+                            </select>
+                            <button class='btn btn-primary btn-lg disabled btn-check-all'>Thực hiện</button>
+                        </div>
+                    </div>
+                    <div class='col-sm-12 col-md-4 col-lg-4'>
+                        <form role='search'>
+                            <div class='form-input'>
+                                <i class='fa-solid fa-magnifying-glass'></i>
+                                <input
+                                    class='form-control me-2'
+                                    type='search'
+                                    placeholder='Search'
+                                    aria-label='Search'
+                                />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <table class='table mt-5'>
+                <thead>
+                    <tr>
+                        <th scope='col'>
+                            <input class='form-check-input' type='checkbox' value='' id='checkbox-all' />
+                        </th>
+                        <th scope='col'>
+                            #
+                            {{{sortable '_id' _sort}}}
+                        </th>
+                        <th scope='col'>Ảnh sản phẩm</th>
+                        <th scope='col'>
+                            Tên sản phẩm
+                        </th>
+                        <th scope='col'>Mô tả</th>
+                        <th scope='col'>Giá sản phẩm</th>
+                        <th scope='col'>Giới tính</th>
+                        <th scope='col'>Thời gian tạo</th>
+                        <th scope='col'>#</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each products}}
+                        <tr>
+                            <td>
+                                <div>
+                                    <input
+                                        class='form-check-input'
+                                        type='checkbox'
+                                        name='productIds[]'
+                                        value='{{this._id}}'
+                                    />
+                                </div>
+                            </td>
+
+                            <td>{{this._id}}</td>
+                            <td>
+                                <img class='table-img' src={{this.image}} alt={{this.name}} />
+                            </td>
+                            <td><span class='table-name'>{{this.name}}</span></td>
+                            <td><span class='table-description'>{{this.description}}</span></td>
+                            <td>{{formatPrice this.price}}</td>
+                            <td>{{this.genderId}}</td>
+                            <td>{{formatDate this.createdAt 'll'}}</td>
+                            <td>
+                                <div class='d-flex flex-column'>
+                                    <a href='/products/{{this._id}}/edit' class='btn btn-info mb-4'>
+                                        <i class='fa-regular fa-pen-to-square'></i>
+                                    </a>
+                                    <a
+                                        href=''
+                                        class='btn btn-danger'
+                                        data-id='{{this._id}}'
+                                        data-bs-toggle='modal'
+                                        data-bs-target='#delete-product-modal'
+                                    >
+                                        <i class='fa-regular fa-trash-can'></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                    {{else}}
+                        <tr>
+                            <td colspan='9' class='text-center'>Không có sản phẩm nào được đăng!!!.
+                                <a class='text-danger' href='/products/create'>Đăng sản phẩm</a>
+                            </td>
+                        </tr>
+
+                    {{/each}}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+{{! Confirm delete }}
+<div class='modal fade' id='delete-product-modal' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title' id='exampleModalLabel'>Xóa sản phẩm??</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                Bạn có chắc chắn xóa sản phẩm này!!!
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Hủy</button>
+                <button id='btn-delete-product' type='button' class='btn btn-danger'>Xóa bỏ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! Delete form }}
+<form method='POST' name='delete-product-form'></form>
+
+<script src='/js/stored-products.js'></script>

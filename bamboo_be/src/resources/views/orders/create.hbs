@@ -1,0 +1,271 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Thêm hóa đơn
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='container-fluid'>
+        <h1 class='mb-5 ps-4 name-create-invoice'>Thêm hóa đơn</h1>
+        <form id='form'>
+            <div class='row'>
+                <div class='col-xl-4 col-md-6 mb-4'>
+                    <div class='form-group'>
+                        <label class='mb-3' for='name'>Tên khách hàng</label>
+                        <div class='input-group'>
+                            <select
+                                onchange='handleUserChange(this)'
+                                class='form-select'
+                                name='name'
+                                id='name'
+                                aria-label='Default select example'
+                            >
+                                <option value=''>-- Tên khách hàng --</option>
+                                {{#each users}}
+                                    <option
+                                        value='{{this._id}}'
+                                        data-email='{{this.email}}'
+                                        data-phone='{{this.phone}}'
+                                    >{{this.firstName}}</option>
+                                {{/each}}
+                            </select>
+                            <span class='input-group-text' id='name'>
+                                <i class='fa-solid fa-user'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-xl-4 col-md-6 mb-4'>
+                    <div class='form-group'>
+                        <label class='mb-3' for='phone'>Số điện thoại khách hàng</label>
+                        <div class='input-group'>
+                            <input
+                                type='text'
+                                class='form-control'
+                                name='phone'
+                                id='phone'
+                                placeholder='Số điện thoại khách hàng...'
+                            />
+                            <span class='input-group-text' id='phone'>
+                                <i class='fa-solid fa-phone'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-xl-4 col-md-6 mb-4'>
+                    <div class='form-group'>
+                        <label class='mb-3' for='statusPayment'>Trạng thái hóa đơn</label>
+                        <div class='input-group'>
+                            <select
+                                class='form-select'
+                                name='statusPayment'
+                                id='statusPayment'
+                                aria-label='Default select example'
+                            >
+                                <option value=''>-- Trạng thái hóa đơn --</option>
+                                <option value='Paid'>Đã trả</option>
+                                <option value='Pending'>Đang chờ</option>
+                                <option value='Cancel'>Hủy thanh toán</option>
+                            </select>
+                            <span class='input-group-text' id='statusPayment'>
+                                <i class='fa-regular fa-face-smile'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-xl-4 col-md-6 mb-4'>
+                    <div class='form-group mb-3'>
+                        <label class='mb-3' for='email'>Email address</label>
+                        <div class='input-group'>
+                            <input
+                                type='text'
+                                class='form-control'
+                                name='email'
+                                id='email'
+                                onchange='verifyEmail(this)'
+                                placeholder='Email khách hàng...'
+                            />
+                            <span class='input-group-text' id='email'>
+                                <i class='fa-solid fa-envelope'></i>
+                            </span>
+                            <span class='input-group-text success' id='email-success'>
+                                <i class='text-success fa-solid fa-circle-check'></i>
+                            </span>
+                            <span class='input-group-text error' id='email-error'>
+                                <i class='text-danger fa-solid fa-circle-exclamation'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-xl-6 col-md-6 mb-4'>
+                    <div class='form-group'>
+                        <label class='mb-3' for='product'>Sản phẩm</label>
+                        <div class='input-group'>
+                            <select
+                                class='form-select'
+                                name='productId'
+                                id='product'
+                                aria-label='Default select example'
+                            >
+                                <option value=''>-- Chọn sản phẩm mua --</option>
+                                {{#each products}}
+                                    <option
+                                        value='{{this._id}}'
+                                        data-name='{{this.name}}'
+                                        data-price='{{this.price}}'
+                                        data-colors='{{json this.colors}}'
+                                        data-sizes='{{json this.sizes}}'
+                                    >{{this.name}}</option>
+                                {{/each}}
+                            </select>
+                            <span class='input-group-text' id='product'>
+                                <i class='fa-solid fa-list'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='container container-table'>
+                <table class='table table-borderless text-center'>
+                    <thead>
+                        <tr class='table-primary'>
+                            <th style='width: 300px' scope='col'>Sản phẩm</th>
+                            <th class='w-90' scope='col'>Số lượng</th>
+                            <th scope='col'>Màu</th>
+                            <th scope='col'>Size</th>
+                            <th scope='col'>Giá sản phẩm</th>
+                            <th scope='col'>Thuế</th>
+                            <th scope='col'>Tổng giá</th>
+                            <th scope='col'>#####</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class='row mt-5'>
+                <div class='col-xl-6 col-md-6 mt-4'>
+                    <div class='form-group'>
+                        <label class='mb-3' for='discount'>Giảm giá</label>
+                        <div class='input-group'>
+                            <select
+                                id='discountId'
+                                name='discountId'
+                                class='form-select'
+                                aria-label='Default select example'
+                            >
+                                <option value=''>-- Chọn phiếu giảm --</option>
+                                {{#each discounts}}
+                                    <option value='{{this._id}}' data-discount='{{this.price}}'>{{this.name}}
+                                        -
+                                        {{this.description}}</option>
+                                {{/each}}
+                            </select>
+                            <span class='input-group-text' id='discount'>
+                                <i class='fa-solid fa-percent'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-xl-6 col-md-6 mt-4'>
+                    <div class='form-group'>
+                        <label class='mb-3' for='tax'>Thuế</label>
+                        <div class='input-group'>
+                            <input type='number' class='form-control' name='tax' id='tax' placeholder='Thuế...' />
+                            <span class='input-group-text' id='tax'>
+                                <i class='fa-solid fa-percent'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='row'>
+                <div class='col-xl-6 col-md-6 mt-4'>
+                    <div class='col-xl-12 col-md-12'>
+                        <div class='form-group mb-5'>
+                            <label class='mb-3' for='methodPayment'>Phương thức thanh toán</label>
+                            <div class='input-group'>
+                                <select
+                                    id='methodPayment'
+                                    name='methodPayment'
+                                    class='form-select'
+                                    aria-label='Default select example'
+                                >
+                                    <option value=''>-- Chọn phương thức thanh toán --</option>
+                                    <option value='Cash'>Thanh toán khi nhận hàng</option>
+                                    <option value='Momo'>Momo</option>
+                                    <option value='VNPay'>VNPay</option>
+                                </select>
+                                <span class='input-group-text' id='methodPayment'>
+                                    <i class='fa-solid fa-percent'></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='col-xl-12 col-md-12'>
+                        <div class='form-group mb-3'>
+                            <label class='mb-3' for='description'>Ghi chú</label>
+                            <div class='form-textarea'>
+                                <textarea
+                                    name='description'
+                                    id='description'
+                                    class='w-100'
+                                    rows='3'
+                                    placeholder='Ghi chú...'
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-xl-6 col-md-6 mt-4'>
+                    <div class='col-item d-flex align-items-center justify-content-between'>
+                        <span class='label-item taxable'>Số tiền chịu thuế</span>
+                        <span class='money-item taxable-amount'>1%</span>
+                    </div>
+                    <div class='col-item d-flex align-items-center justify-content-between'>
+                        <span class='label-item'>Số tiền giảm giá</span>
+                        <span class='money-item'>0 VNĐ</span>
+                    </div>
+                    <div class='col-item d-flex align-items-center justify-content-between'>
+                        <span class='label-item money-bill'>Tổng hóa đơn</span>
+                        <span class='money-item'>0 VNĐ</span>
+                    </div>
+                    <div class='col-item d-flex align-items-start flex-column'>
+                        <div class='input-group'>
+                            <input
+                                class='form-control'
+                                id='signature'
+                                name='signature'
+                                type='text'
+                                placeholder='Chữ ký của bạn....'
+                            />
+                            <span class='input-group-text' id='signature'>
+                                <i class='fa-solid fa-signature'></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='d-flex align-items-center justify-content-end pe-4 pb-5'>
+                <button class='btn btn-cancel'>Hủy</button>
+                <button type='submit' class='btn btn-create'>Tạo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src='/js/orders.js'></script>

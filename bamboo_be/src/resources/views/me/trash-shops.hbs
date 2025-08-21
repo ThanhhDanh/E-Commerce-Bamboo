@@ -1,0 +1,104 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Cửa hàng đã xóa
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='trash-header'>
+        <a href='/me/stored/shops'>
+            <i class='fa-solid fa-arrow-left'></i>
+            Danh sách cửa hàng
+        </a>
+        <h1>Danh sách cửa hàng đã xóa</h1>
+    </div>
+
+    <table class='table mt-4'>
+        <thead>
+            <tr>
+                <th scope='col'>#</th>
+                <th scope='col'>Ảnh cửa hàng</th>
+                <th scope='col'>Tên cửa hàng</th>
+                <th scope='col'>Địa chỉ</th>
+                <th scope='col'>Chủ cửa hàng</th>
+                <th scope='col'>Loại cửa hàng</th>
+                <th scope='col'>Thời gian xóa</th>
+                <th scope='col'>#</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each shops}}
+                <tr>
+                    <th scope='row'>{{this._id}}</th>
+                    <td>
+                        <img class='table-img-shop' src={{this.image}} alt={{this.name}} />
+                    </td>
+                    <td>{{this.name}}</td>
+                    <td>{{this.address}}</td>
+                    <td>{{this.ownerId}}</td>
+                    <td>{{this.categoryId}}</td>
+                    <td>{{formatDate this.deletedAt 'll'}}</td>
+                    <td>
+                        <div class='d-flex flex-column'>
+                            <a href='' class='btn btn-info mb-4 btn-restore' data-id='{{this._id}}'>
+                                <i class='fa-solid fa-clock-rotate-left'></i>
+                            </a>
+                            <a
+                                href=''
+                                class='btn btn-danger'
+                                data-id='{{this._id}}'
+                                data-bs-toggle='modal'
+                                data-bs-target='#delete-shop-modal'
+                            >
+                                <i class='fa-solid fa-xmark'></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
+            {{else}}
+                <tr>
+                    <td colspan='8' class='text-center'>Thùng rác rỗng.
+                        <a class='text-danger' href='/me/stored/shops'>Danh sách cửa hàng</a>
+                    </td>
+                </tr>
+
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+{{! Confirm delete }}
+<div class='modal fade' id='delete-shop-modal' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title' id='exampleModalLabel'>Xóa cửa hàng??</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                Bạn có chắc chắn xóa cửa hàng này?? Khi không khôi phục lại được.
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Hủy</button>
+                <button id='btn-delete-shop' type='button' class='btn btn-danger'>Xóa vĩnh viễn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! Delete form }}
+<form method='POST' name='delete-shop-form'></form>
+<form method='POST' name='restore-shop-form'></form>
+
+<script src='/js/trash-shops.js'></script>
