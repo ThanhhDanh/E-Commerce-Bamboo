@@ -1,0 +1,22 @@
+name: Deploy Frontend to Vercel
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "bamboo_fe/**"   # chỉ chạy nếu thay đổi frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Vercel
+        run: |
+          npm install -g vercel
+          cd bamboo_fe
+          vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
