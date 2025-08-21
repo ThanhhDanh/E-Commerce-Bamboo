@@ -6,6 +6,7 @@
     "scripts": {
         "beautiful": "lint-staged",
         "dev": "nodemon --inspect src/index.js",
+        "render": "node src/index.js",
         "watch": "sass --watch src/resources/scss/app.scss:src/public/css/app.css",
         "start": "pm2 start ecosystem.config.js && pm2 save",
         "stop": "pm2 stop all && pm2 delete all",
