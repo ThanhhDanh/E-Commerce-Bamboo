@@ -11,8 +11,11 @@ const meRouter = require('./me');
 const ordersRouter = require('./orders');
 const chatRouter = require('./chat');
 const webhookRouter = require('./webhook');
+const indexRouterAPI = require('../routes/api/index');
 
 function route(app) {
+    app.use('/api/', indexRouterAPI);
+
     app.use('/webhook', webhookRouter);
     app.use('/chat', chatRouter);
     app.use('/orders', ordersRouter);

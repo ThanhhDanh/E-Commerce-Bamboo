@@ -1,6 +1,10 @@
 module.exports = function (req, res, next) {
     const publicRoutes = ['/', '/login', '/register', '/create', '/webhook/chat']; // Các route không yêu cầu đăng nhập
 
+    if (req.path.startsWith('/api')) {
+        return next();
+    }
+
     if (!req.session.user && !publicRoutes.includes(req.path)) {
         return res.redirect('/'); // Chỉ redirect nếu không ở trang login
     }
