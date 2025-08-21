@@ -1,0 +1,19 @@
+name: Deploy Backend to Render
+
+on:
+  push:
+    branches:
+      - main   # chỉ deploy khi merge/push vào main
+    paths:
+      - "bamboo_be/**"   # chỉ chạy nếu thay đổi trong thư mục backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Trigger Render Deploy
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
