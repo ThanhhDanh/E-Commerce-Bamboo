@@ -1,9 +1,17 @@
-const { createClient } = require('redis');
+const Redis = require('ioredis');
 
-const redisClient = createClient();
+const redis = new Redis(process.env.REDIS_URL, {
+    tls: {
+        rejectUnauthorized: false, // Upstash yêu cầu TLS
+    },
+});
 
-redisClient.connect();
+redis.on('connect', () => {
+    console.log('Connected to Redis (Upstash)');
+});
 
-redisClient.on('error', (err) => console.error('Redis Client Error', err));
+redis.on('error', (err) => {
+    console.error('Redis connection error:', err);
+});
 
-module.exports = redisClient;
+module.exports = redis;
