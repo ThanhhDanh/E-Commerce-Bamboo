@@ -11,7 +11,7 @@ module.exports = (io) => {
         // Join room theo userId
         socket.on('join', async (userId) => {
             socket.join(String(userId));
-            await redisClient.set(`online:${userId}`, '1', { EX: 60 * 5 });
+            await redisClient.set(`online:${userId}`, '1', 'EX', 60 * 5);
             console.log(`User ${userId} joined room`);
         });
 

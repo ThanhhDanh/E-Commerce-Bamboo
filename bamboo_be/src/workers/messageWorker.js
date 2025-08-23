@@ -4,10 +4,22 @@ const Conversations = require('../app/models/Conversations');
 const Messages = require('../app/models/Messages');
 const sendWebhook = require('../util/webhook');
 
-const connection = new IORedis({
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false,
-});
+let connection;
+
+if (process.env.REDIS_URL === 'production') {
+    connection = new IORedis(process.env.REDIS_URL, {
+        maxRetriesPerRequest: null,
+        enableReadyCheck: false,
+        tls: {
+            rejectUnauthorized: false,
+        },
+    });
+} else {
+    connection = new IORedis({
+        maxRetriesPerRequest: null,
+        enableReadyCheck: false,
+    });
+}
 
 new Worker(
     'messages',
