@@ -1,22 +1,14 @@
 const { Queue, Worker } = require('bullmq');
 const IORedis = require('ioredis');
 
-let connection;
+const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const useTls = redisUrl.startsWith('rediss://');
 
-if (process.env.REDIS_URL === 'production') {
-    connection = new IORedis(process.env.REDIS_URL, {
-        maxRetriesPerRequest: null,
-        enableReadyCheck: false,
-        tls: {
-            rejectUnauthorized: false,
-        },
-    });
-} else {
-    connection = new IORedis({
-        maxRetriesPerRequest: null,
-        enableReadyCheck: false,
-    });
-}
+const connection = new IORedis(process.env.REDIS_URL, {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+    ...(useTls && { tls: { rejectUnauthorized: false } }),
+});
 
 const messageQueue = new Queue('messages', { connection });
 

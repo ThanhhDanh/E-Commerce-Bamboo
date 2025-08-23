@@ -1,16 +1,11 @@
 const Redis = require('ioredis');
 
-let redis;
+const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const useTls = redisUrl.startsWith('rediss://');
 
-if (process.env.REDIS_URL === 'production') {
-    redis = new Redis(process.env.REDIS_URL, {
-        tls: {
-            rejectUnauthorized: false, // Upstash yêu cầu TLS
-        },
-    });
-} else {
-    redis = new Redis({});
-}
+const redis = new Redis(redisUrl, {
+    ...(useTls && { tls: { rejectUnauthorized: false } }),
+});
 
 redis.on('connect', () => {
     console.log('Connected to Redis (Upstash)');
