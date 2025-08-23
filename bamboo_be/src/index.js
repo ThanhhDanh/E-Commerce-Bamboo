@@ -41,8 +41,8 @@ app.use(
         resave: false,
         saveUninitialized: false,
         store: MongoStore.create({
-            // mongoUrl: 'mongodb://127.0.0.1:27017/data_bamboo_dev', // Thay bằng URL MongoDB của bạn
-            mongoUrl: process.env.MONGO_URI,
+            mongoUrl: 'mongodb://127.0.0.1:27017/data_bamboo_dev', // Thay bằng URL MongoDB của bạn
+            // mongoUrl: process.env.MONGO_URI,
             collectionName: 'sessions',
         }),
         cookie: {
