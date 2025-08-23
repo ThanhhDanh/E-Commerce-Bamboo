@@ -35,14 +35,15 @@ const db = require('./config/db');
 //Connect to database
 db.connect();
 
+const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/data_bamboo_dev';
+
 app.use(
     session({
         secret: 'm0n7K', // Chuỗi bí mật để mã hóa session
         resave: false,
         saveUninitialized: false,
         store: MongoStore.create({
-            mongoUrl: 'mongodb://127.0.0.1:27017/data_bamboo_dev', // Thay bằng URL MongoDB của bạn
-            // mongoUrl: process.env.MONGO_URI,
+            mongoUrl: mongoUri,
             collectionName: 'sessions',
         }),
         cookie: {
