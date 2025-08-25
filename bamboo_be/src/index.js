@@ -10,6 +10,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const http = require('http');
 const { Server } = require('socket.io');
+const cors = require('cors');
 const chatSocket = require('./app/socket/chatSocket');
 const app = express();
 const port = 3000;
@@ -26,6 +27,15 @@ chatSocket(io); // Truy cập socket io
 
 // 👇 cho các nơi khác có thể emit
 app.set('io', io);
+
+//Cấu hình CORS
+app.use(
+    cors({
+        origin: ['http://localhost:5173', 'https://e-commerce-bamboo.vercel.app'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+    }),
+);
 
 const sortMiddleware = require('./app/middlewares/sortMiddleware');
 
