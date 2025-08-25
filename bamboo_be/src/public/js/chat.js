@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const socket = io('http://127.0.0.1:3000');
+    const SOCKET_API = process.env.BE_WEBHOOK_URL || 'http://127.0.0.1:3000';
+    const socket = io(`${SOCKET_API}`);
     const currentUserId = typeof CURRENT_USER_ID !== 'undefined' ? CURRENT_USER_ID : null;
 
     if (currentUserId) {
