@@ -30,6 +30,7 @@
         "bullmq": "^5.56.9",
         "cloudinary": "^1.30.0",
         "connect-mongo": "^5.1.0",
+        "cors": "^2.8.5",
         "express": "^4.21.2",
         "express-handlebars": "^8.0.1",
         "express-session": "^1.18.1",
