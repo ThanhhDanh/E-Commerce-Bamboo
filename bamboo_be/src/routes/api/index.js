@@ -12,6 +12,10 @@ router.post('/categories', categoriesController.storeAPI);
 
 // API Products
 router.get('/products', meController.index);
+router.get('/products/newest', meController.newestProducts);
+router.get('/products/upcoming', meController.upcomingProducts);
+router.get('/products/appear/sale', meController.appearSaleProducts);
+router.get('/products/weekly-deals', meController.weeklyDealProducts);
 router.get('/colors', productsController.indexColor);
 router.get('/genders', productsController.indexGender);
 router.get('/sizes', productsController.indexSize);
