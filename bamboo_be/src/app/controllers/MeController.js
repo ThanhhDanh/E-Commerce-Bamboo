@@ -14,6 +14,71 @@ class MeController {
             .catch(next);
     }
 
+    //[GET] /products/newest - Sản phẩm mới nhất
+    newestProducts(req, res, next) {
+        Product.find({})
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .then((newest) => {
+                res.json(newest);
+            })
+            .catch(next);
+    }
+
+    //[GET] /products/upcoming - Sản phẩm ra mắt
+    upcomingProducts(req, res, next) {
+        Product.find({
+            $and: [
+                { isFeatured: true },
+                { releaseDate: { $gte: new Date() } }, // Chưa đến ngày ra mắt
+            ],
+        })
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .then((upcoming) => {
+                res.json(upcoming);
+            })
+            .catch(next);
+    }
+
+    //[GET] /products/appear/sale - Sản phẩm ra mắt và đang giảm giá
+    appearSaleProducts(req, res, next) {
+        Product.find({
+            $and: [{ isFeatured: true }, { releaseDate: { $gte: new Date() } }, { salePrice: { $ne: null } }],
+        })
+            .sort({ createdAt: -1 })
+            .limit(3)
+            .then((sale) => {
+                res.json(sale);
+            })
+            .catch(next);
+    }
+
+    //[GET] /products/weeky-deals - Sản phẩm ưu đãi trong tuần
+    weeklyDealProducts(req, res, next) {
+        const now = new Date();
+
+        Product.find({
+            'weeklyDeal.isActive': true,
+            'weeklyDeal.startDate': { $lte: now },
+            'weeklyDeal.endDate': { $gte: now },
+        })
+            .then((weekly) => {
+                const withSalePrice = weekly.map((w) => {
+                    const discount = w.weeklyDeals?.discountPercent || 0;
+                    return {
+                        ...w._doc,
+                        salePrice: Math.round(w.price * (1 - discount / 100)),
+                    };
+                });
+
+                res.json(withSalePrice);
+            })
+            .catch(next);
+    }
+
+    // ==============================================================================================================//
+
     // [GET] /stored/products
     storedProducts(req, res, next) {
         Promise.all([Product.find({}).sortable(req), Product.countDocumentsWithDeleted({ deleted: true })])
