@@ -54,25 +54,18 @@ class MeController {
             .catch(next);
     }
 
-    //[GET] /products/weeky-deals - Sản phẩm ưu đãi trong tuần
+    //[GET] /products/weekly-deals - Sản phẩm ưu đãi trong tuần
     weeklyDealProducts(req, res, next) {
         const now = new Date();
 
         Product.find({
             'weeklyDeal.isActive': true,
-            'weeklyDeal.startDate': { $lte: now },
             'weeklyDeal.endDate': { $gte: now },
         })
+            .sort({ createdAt: -1 })
+            .populate('weeklyDeal.discountId')
             .then((weekly) => {
-                const withSalePrice = weekly.map((w) => {
-                    const discount = w.weeklyDeals?.discountPercent || 0;
-                    return {
-                        ...w._doc,
-                        salePrice: Math.round(w.price * (1 - discount / 100)),
-                    };
-                });
-
-                res.json(withSalePrice);
+                res.json(weekly);
             })
             .catch(next);
     }

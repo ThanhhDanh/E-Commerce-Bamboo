@@ -7,6 +7,8 @@ const { mongodbToObject, mutipleMongooseToObject } = require('../../util/mongoos
 const fs = require('fs');
 const Sizes = require('../models/Sizes');
 const Colors = require('../models/Colors');
+const Discounts = require('../models/Discounts');
+const discountCache = require('../../util/discountCache');
 
 class ProductController {
     //[GET] /colors
@@ -52,54 +54,75 @@ class ProductController {
         Promise.all([
             Gender.find({}),
             Category.find({}),
+            Discounts.find({}),
             Shop.find({}),
             User.find({ role: 'seller' }),
             Sizes.find({}),
             Colors.find({}),
         ])
-            .then(([genders, categories, shops, users, sizes, colors]) => {
+            .then(([genders, categories, discounts, shops, users, sizes, colors]) => {
                 res.render('products/create', {
                     users: mutipleMongooseToObject(users),
                     categories: mutipleMongooseToObject(categories),
+                    discounts: mutipleMongooseToObject(discounts),
                     genders: mutipleMongooseToObject(genders),
                     shops: mutipleMongooseToObject(shops),
                     sizes: mutipleMongooseToObject(sizes),
                     colors: mutipleMongooseToObject(colors),
+
+                    defaultUserId: users.length ? users[0]._id.toString() : null,
+                    defaultShopId: shops.length ? shops[0]._id.toString() : null,
                 });
             })
             .catch(next);
     }
 
     // [POST] /products/store
-    store(req, res, next) {
+    async store(req, res, next) {
         try {
+            console.log(req.body);
             if (req.file) {
                 const imageUrl = req.file.path;
                 req.body.image = imageUrl;
+            } else {
+                return res.status(400).json({ message: 'Ảnh sản phẩm không được để trống' });
             }
+            if (req.body.weeklyDeal) {
+                req.body.weeklyDeal = {
+                    isActive: req.body.weeklyDeal.isActive === 'true',
+                    discountId: Number(req.body.weeklyDeal.discountId) || null,
+                    startDate: req.body.weeklyDeal.startDate
+                        ? new Date(req.body.weeklyDeal.startDate + 'T00:00:00Z')
+                        : null,
+                    endDate: req.body.weeklyDeal.endDate ? new Date(req.body.weeklyDeal.endDate + 'T00:00:00Z') : null,
+                };
+            }
+            req.body.isFeatured = req.body.isFeatured === 'true';
             const product = new Product({
                 ...req.body,
-                sizeIds: req.body.sizeIds || [],
-                colorIds: req.body.colorIds || [],
+                sizeIds: req.body.sizeId || [],
+                colorIds: req.body.colorId || [],
             });
-            product
-                .save()
-                .then(() => res.redirect('/me/stored/products'))
-                .catch(next);
-        } catch (error) {
-            next(err);
-        }
 
-        if (req.file) {
-            const imageUrl = req.file.path;
-            req.body.image = imageUrl;
-            const product = new Product(req.body);
-            product
-                .save()
-                .then(() => res.redirect('/me/stored/products'))
-                .catch(next);
-        } else {
-            return res.status(400).json({ message: 'Ảnh sản phẩm không được để trống' });
+            let discount = null;
+            if (product.weeklyDeal?.isActive && product.weeklyDeal.discountId) {
+                discount = discountCache.get(product.weeklyDeal.discountId);
+            } else if (product.discountId) {
+                discount = discountCache.get(product.discountId);
+            }
+
+            //Nếu discount là số tiền giảm trực tiếp
+            if (discount && discount.price > 0) {
+                const discountAmount = product.price * (discount.price / 100);
+                product.salePrice = Math.max(0, product.price - discountAmount);
+            } else {
+                product.salePrice = product.price;
+            }
+
+            await product.save();
+            res.redirect('/me/stored/products');
+        } catch (error) {
+            next(error);
         }
     }
 

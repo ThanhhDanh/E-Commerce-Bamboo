@@ -33,7 +33,7 @@
                  <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="mb-3">
                         <label for="description" class="form-label">Mô tả sản phẩm</label>
-                        <textarea class="form-description" id="description" rows="20" name="description" placeholder="Description..." rows="4" cols="50">{{oldData.description}}</textarea>
+                        <textarea class="form-description" id="description" rows="10" name="description" placeholder="Mô tả..." rows="4" cols="50">{{oldData.description}}</textarea>
                         {{{validateInput errors "description"}}}
                     </div>
                 </div>
@@ -41,26 +41,46 @@
                 <div class="col-sm-12 col-md-3 col-lg-3">
                     <div class="mb-3">
                         <label for="name" class="form-label">Tên sản phẩm</label>
-                        <input type="text" class="form-control value="{{oldData.name}}"" id="name" name="name" placeholder="Name..." >
+                        <input type="text" class="form-control value="{{oldData.name}}"" id="name" name="name" placeholder="Tên sản phẩm..." >
                         {{{validateInput errors "name"}}}
                     </div>
                     <div class="mb-3">
                         <label for="price" class="form-label">Giá sản phẩm</label>
-                        <input type="text" class="form-control" id="price" value="{{oldData.price}}" name="price" placeholder="Price..." >
+                        <input type="text" class="form-control" id="price" value="{{oldData.price}}" name="price" placeholder="Giá..." >
                         {{{validateInput errors "price"}}}
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-3 col-lg-3">
                     <div class="mb-3">
+                        <label for="discountId" class="form-label">% giảm giá</label>
+                        <select class="form-control" id="discountId" name="discountId">
+                            <option value="">-- Chọn % giảm giá --</option>
+                            {{#each discounts}}
+                                <option value="{{this._id}}" data-price="{{this.price}}" {{#if (eq this._id ../oldData.discountId)}}selected{{/if}}>
+                                    {{this.name}}
+                                </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "discountId"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="salePrice" class="form-label">Giá giảm sản phẩm</label>
+                        <input disabled type="text" class="form-control" id="salePrice" value="{{oldData.salePrice}}" name="salePrice" placeholder="Giá giảm..." >
+                        {{{validateInput errors "salePrice"}}}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
                         <label for="userId" class="form-label">Chủ của sản phẩm</label>
-                        <select class="form-control" id="userId" name="userId">
+                        <select class="form-control" id="userId" name="userId" disabled>
                             <option value="">-- Chủ shop của sản phẩm --</option>
                             {{#each users}}
-                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.userId)}}selected{{/if}}>
+                                <option value="{{this._id}}" {{#if (eq this._id ../defaultUserId)}}selected{{/if}}>
                                     {{this.firstName}}
                                 </option>
                             {{/each}}
                         </select>
+                        <input type="hidden" name="userId" value="{{ defaultUserId }}">
                         {{{validateInput errors "userId"}}}
                     </div>
                     <div class="mb-3">
@@ -91,14 +111,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="shopId" class="form-label">Cửa hàng cho sản phẩm</label>
-                        <select class="form-control" id="shopId" name="shopId">
+                        <select class="form-control" id="shopId" name="shopId" disabled>
                             <option value="">-- Chọn cửa hàng cho sản phẩm --</option>
                             {{#each shops}}
-                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.shopId)}}selected{{/if}}>
+                                <option value="{{this._id}}" {{#if (eq this._id ../defaultShopId)}}selected{{/if}}>
                                     {{this.name}}
                                 </option>
                             {{/each}}
                         </select>
+                        <input type="hidden" name="userId" value="{{ defaultShopId }}">
                         {{{validateInput errors "shopId"}}}
                     </div>
                 </div>
@@ -128,6 +149,70 @@
                         {{{validateInput errors "colorId"}}}
                     </div>
                 </div>
+                 <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
+                        <label for="isFeatured" class="form-label mb-4">Sản phẩm ra mắt</label>
+                        <div class="checkbox-wrapper-46">
+                        <input type="hidden" name="isFeatured" value="false">
+                        <input type="checkbox" id="cbx-46" name="isFeatured" value="true" class="inp-cbx" {{#if oldData.isFeatured}}checked{{/if}}/>
+                        <label for="cbx-46" class="cbx"
+                            ><span>
+                            <svg viewBox="0 0 12 10" height="10px" width="12px">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
+                            ><span>Sản phẩm nổi bật</span>
+                        </label>
+                        </div>
+                        {{{validateInput errors "isFeatured"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="releaseDate" class="form-label">Ngày ra mắt</label>
+                        <input type="text" class="form-control flatpickr" id="releaseDate" value="{{oldData.releaseDate}}" name="releaseDate" placeholder="Ngày ra mắt sản phẩm..." >
+                        {{{validateInput errors "releaseDate"}}}
+                    </div>
+                </div>
+                {{!-- Field weeklyDeal --}}
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
+                        <label for="weeklyDeal" class="form-label mb-4">Ưu đãi trong tuần</label>
+                        <div class="checkbox-wrapper-46">
+                        <input type="checkbox" id="weeklyDeal" name="weeklyDeal[isActive]" class="inp-cbx" value="true"
+                            {{#if oldData.weeklyDeal.isActive}}checked{{/if}} />
+                        <label for="weeklyDeal" class="cbx">
+                            <span>
+                            <svg viewBox="0 0 12 10" height="10px" width="12px">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                            </span>
+                            <span> Kích hoạt ưu đãi tuần </span>
+                        </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="weeklyDealDiscount" class="form-label">% Giảm giá</label>
+                        <select class="form-control" id="weeklyDealDiscount" name="weeklyDeal[discountId]">
+                        <option value="">-- Chọn % giảm giá --</option>
+                        {{#each discounts}}
+                            <option value="{{this._id}}" {{#if (eq this._id ../oldData.weeklyDeal.discountId)}}selected{{/if}}>
+                            {{this.name}}
+                            </option>
+                        {{/each}}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-1">
+                        <label for="weeklyDealStart" class="form-label">Ngày bắt đầu</label>
+                        <input type="text" class="form-control flatpickr" id="weeklyDealStart" placeholder="Ngày bắt đầu..."
+                        name="weeklyDeal[startDate]" value="{{oldData.weeklyDeal.startDate}}" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="weeklyDealEnd" class="form-label">Ngày kết thúc</label>
+                        <input type="text" class="form-control flatpickr" id="weeklyDealEnd" placeholder="Ngày kết thúc..."
+                        name="weeklyDeal[endDate]" value="{{oldData.weeklyDeal.endDate}}" />
+                    </div>
+                </div>
             </div>
             <button type="submit" class="btn btn-success btn-lg">Thêm sản phẩm</button>
         </form>
@@ -142,5 +227,39 @@
                 allowClear: true,
             });
         });
+
+        $('.flatpickr').flatpickr({
+            locale: "vn",
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d/m/Y",
+            defaultDate: new Date(),
+            allowInput: true
+        })
+
+        //Tính toán giá giảm
+        const priceInput = document.getElementById("price");
+        const discountSelect = document.getElementById("discountId");
+        const salePriceInput = document.getElementById("salePrice");
+
+        function calcSalePrice() {
+            const price = parseFloat(priceInput.value) || 0;
+            const option = discountSelect.options[discountSelect.selectedIndex];
+            const discountPrice = option.getAttribute("data-price");
+
+            if (price > 0 && discountPrice > 0) {
+                const discount = parseFloat(discountPrice);
+                const salePrice = price - (price * discount / 100);
+                salePriceInput.value = salePrice.toLocaleString("vi-VN", { maximumFractionDigits: 0 });
+            } else {
+                salePriceInput.value = "";
+            }
+        }
+
+        priceInput.addEventListener("input", calcSalePrice);
+        discountSelect.addEventListener("change", calcSalePrice);
+
+        // gọi 1 lần khi load trang
+        calcSalePrice();
     })
 </script>

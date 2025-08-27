@@ -13,8 +13,8 @@ const Product = new Schema(
         image: { type: String },
         description: { type: String },
         price: { type: Number, required: true },
-        salePrice: { type: Number },
-        discountId: { type: Number, ref: 'Discount' },
+        salePrice: { type: Number, default: null },
+        discountId: { type: Number, ref: 'Discount', default: null },
         isFeatured: { type: Boolean, default: false },
         releaseDate: { type: Date, default: null },
         weeklyDeal: {
