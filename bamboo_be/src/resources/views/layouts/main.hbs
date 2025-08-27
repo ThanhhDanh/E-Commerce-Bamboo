@@ -38,6 +38,9 @@
         <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
         <link href="/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
 
+        {{!-- Flatpickr --}}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     </head>
     <body>
         <div class="app">
@@ -242,6 +245,11 @@
         <!-- Custom js for this page -->
         <script src="/js/dashboard.js"></script>
         <script src='/js/chat.js'></script>
+
+        {{!-- Flatpickr --}}
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+
         <script>
           document.addEventListener('DOMContentLoaded', function() {
              $(document).ready(function() {

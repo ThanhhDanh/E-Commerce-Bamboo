@@ -12,8 +12,14 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const chatSocket = require('./app/socket/chatSocket');
+const discountCache = require('./util/discountCache');
 const app = express();
 const port = 3000;
+
+(async () => {
+    await discountCache.load();
+    console.log('Discount cache loaded');
+})();
 
 const server = http.createServer(app);
 const io = new Server(server, {
