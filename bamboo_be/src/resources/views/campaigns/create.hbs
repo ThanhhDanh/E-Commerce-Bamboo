@@ -1,0 +1,118 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Chiến dịch - Chương trình
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class='container-fluid'>
+        <h1 class='text-center'>Thêm chiến dịch</h1>
+        <form method='POST' action='/campaigns/store'>
+            <div class='row'>
+                <div class='col-sm-12 col-md-6'>
+                    <div class='mb-3'>
+                        <label for='name' class='form-label'>Tên chiến dịch</label>
+                        <input
+                            type='text'
+                            class='form-control'
+                            id='name'
+                            name='name'
+                            placeholder='Ví dụ: Sale Quốc Khánh'
+                            required
+                        />
+                    </div>
+                </div>
+                <div class='col-sm-12 col-md-3'>
+                    <div class='mb-3'>
+                        <label for='startDate' class='form-label'>Ngày bắt đầu</label>
+                        <input type='date' class='form-control flatpickr' id='startDate' name='startDate' required />
+                    </div>
+                </div>
+                <div class='col-sm-12 col-md-3'>
+                    <div class='mb-3'>
+                        <label for='endDate' class='form-label'>Ngày kết thúc</label>
+                        <input type='date' class='form-control flatpickr' id='endDate' name='endDate' required />
+                    </div>
+                </div>
+            </div>
+            <button type='submit' class='btn btn-success btn-lg'>Thêm chiến dịch</button>
+        </form>
+    </div>
+
+    <div class='container-fluid mt-5'>
+        <h2 class='mb-4'>Danh sách chiến dịch</h2>
+        <table class='table'>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên chiến dịch</th>
+                    <th>Thời gian</th>
+                    <th>Ngày tạo</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each campaigns}}
+                    <tr data-id='{{this._id}}' data-start='{{this.startDate}}' data-end='{{this.endDate}}'>
+                        <td class='cell-id'>{{this._id}}</td>
+                        <td class='cell-name'>{{this.name}}</td>
+                        <td class='cell-dates'>{{formatDate this.startDate 'll'}}
+                            -
+                            {{formatDate this.endDate 'll'}}</td>
+                        <td class='cell-created'>{{formatDate this.createdAt 'll'}}</td>
+                        <td class='cell-actions'>
+                            <button class='btn btn-warning btn-sm btn-edit'>
+                                <i class='fa fa-edit'></i>
+                            </button>
+                            <button
+                                class='btn btn-danger btn-sm btn-delete'
+                                data-bs-toggle='modal'
+                                data-bs-target='#delete-campaign-modal'
+                                data-id='{{this._id}}'
+                            >
+                                <i class='fa fa-trash'></i>
+                            </button>
+                            <a href='/campaigns/{{this._id}}/products' class='btn btn-primary btn-sm'>
+                                <i class='fa fa-box'></i>
+                            </a>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{! Confirm delete }}
+<div class='modal fade' id='delete-campaign-modal' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title' id='exampleModalLabel'>Xóa chiến dịch??</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                Bạn có chắc chắn xóa chiến dịch này!!!
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Hủy</button>
+                <button id='btn-delete-campaign' type='button' class='btn btn-danger'>Xóa bỏ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! Delete form }}
+<form method='POST' name='delete-campaign-form'></form>
+
+<script src='/js/campaign.js'></script>

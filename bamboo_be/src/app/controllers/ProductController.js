@@ -80,44 +80,21 @@ class ProductController {
     // [POST] /products/store
     async store(req, res, next) {
         try {
-            console.log(req.body);
             if (req.file) {
                 const imageUrl = req.file.path;
                 req.body.image = imageUrl;
             } else {
                 return res.status(400).json({ message: 'Ảnh sản phẩm không được để trống' });
             }
-            if (req.body.weeklyDeal) {
-                req.body.weeklyDeal = {
-                    isActive: req.body.weeklyDeal.isActive === 'true',
-                    discountId: Number(req.body.weeklyDeal.discountId) || null,
-                    startDate: req.body.weeklyDeal.startDate
-                        ? new Date(req.body.weeklyDeal.startDate + 'T00:00:00Z')
-                        : null,
-                    endDate: req.body.weeklyDeal.endDate ? new Date(req.body.weeklyDeal.endDate + 'T00:00:00Z') : null,
-                };
-            }
-            req.body.isFeatured = req.body.isFeatured === 'true';
+            req.body.isFeatured = Array.isArray(req.body.isFeatured)
+                ? req.body.isFeatured.includes('true')
+                : req.body.isFeatured === 'true';
+
             const product = new Product({
                 ...req.body,
                 sizeIds: req.body.sizeId || [],
                 colorIds: req.body.colorId || [],
             });
-
-            let discount = null;
-            if (product.weeklyDeal?.isActive && product.weeklyDeal.discountId) {
-                discount = discountCache.get(product.weeklyDeal.discountId);
-            } else if (product.discountId) {
-                discount = discountCache.get(product.discountId);
-            }
-
-            //Nếu discount là số tiền giảm trực tiếp
-            if (discount && discount.price > 0) {
-                const discountAmount = product.price * (discount.price / 100);
-                product.salePrice = Math.max(0, product.price - discountAmount);
-            } else {
-                product.salePrice = product.price;
-            }
 
             await product.save();
             res.redirect('/me/stored/products');
@@ -153,6 +130,8 @@ class ProductController {
             if (req.file) {
                 updateFields.image = `/uploads/${req.file.filename}`;
             }
+
+            updateFields.isFeatured = updateFields.isFeatured === 'true';
 
             // Cập nhật dữ liệu sản phẩm trong MongoDB
             Product.updateOne({ _id: req.params.id }, updateFields)

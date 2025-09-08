@@ -1,6 +1,8 @@
 const Product = require('../models/Products');
 const Shop = require('../models/Shops');
 const { mutipleMongooseToObject } = require('../../util/mongoose');
+const Campaigns = require('../models/Campaigns');
+const CampaignProducts = require('../models/CampaignProducts');
 
 class MeController {
     //API Frontend
@@ -42,32 +44,43 @@ class MeController {
     }
 
     //[GET] /products/appear/sale - Sản phẩm ra mắt và đang giảm giá
-    appearSaleProducts(req, res, next) {
-        Product.find({
-            $and: [{ isFeatured: true }, { releaseDate: { $gte: new Date() } }, { salePrice: { $ne: null } }],
-        })
-            .sort({ createdAt: -1 })
-            .limit(3)
-            .then((sale) => {
-                res.json(sale);
-            })
-            .catch(next);
-    }
+    // appearSaleProducts(req, res, next) {
+    //     Product.find({
+    //         $and: [{ isFeatured: true }, { releaseDate: { $gte: new Date() } }, { salePrice: { $ne: null } }],
+    //     })
+    //         .sort({ createdAt: -1 })
+    //         .limit(3)
+    //         .then((sale) => {
+    //             res.json(sale);
+    //         })
+    //         .catch(next);
+    // }
 
     //[GET] /products/weekly-deals - Sản phẩm ưu đãi trong tuần
-    weeklyDealProducts(req, res, next) {
-        const now = new Date();
+    async weeklyDealProducts(req, res, next) {
+        try {
+            const now = new Date();
 
-        Product.find({
-            'weeklyDeal.isActive': true,
-            'weeklyDeal.endDate': { $gte: now },
-        })
-            .sort({ createdAt: -1 })
-            .populate('weeklyDeal.discountId')
-            .then((weekly) => {
-                res.json(weekly);
-            })
-            .catch(next);
+            const campaign = await Campaigns.findOne({
+                type: 'weekly',
+                startDate: { $lte: now },
+                endDate: { $gte: now },
+            });
+
+            if (!campaign) return res.json([]);
+
+            const campaignProducts = await CampaignProducts.find({ campaignId: campaign._id }).populate('productId');
+
+            const products = campaignProducts.map((cp) => {
+                const product = cp.productId.toObject();
+                product.finalPrice = cp.salePrice ?? product.price;
+                return product;
+            });
+
+            res.json(products);
+        } catch (err) {
+            next(err);
+        }
     }
 
     // ==============================================================================================================//

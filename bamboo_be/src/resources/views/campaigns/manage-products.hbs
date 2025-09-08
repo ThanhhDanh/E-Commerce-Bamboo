@@ -1,0 +1,55 @@
+<div class='content-wrapper'>
+    <div class='page-header'>
+        <h3 class='page-title'>
+            <span class='page-title-icon bg-gradient-primary text-white me-2'>
+                <i class='mdi mdi-home'></i>
+            </span>
+            Chiến dịch - Chương trình
+        </h3>
+        <nav aria-label='breadcrumb'>
+            <ul class='breadcrumb'>
+                <li class='breadcrumb-item active' aria-current='page'>
+                    <span></span>Overview
+                    <i class='mdi mdi-alert-circle-outline icon-sm text-primary align-middle'></i>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="container-fluid">
+        <h1 class="text-center">Quản lý sản phẩm trong chiến dịch: {{campaign.name}}</h1>
+
+        <form method="POST" action="/campaigns/{{campaign._id}}/products">
+            <table class="table my-5">
+                <thead>
+                    <tr class="text-center">
+                        <th scope="col">Chọn</th>
+                        <th scope="col">Sản phẩm</th>
+                        <th scope="col">Giá gốc</th>
+                        <th scope="col">Giá KM (nếu có)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each products}}
+                    <tr>
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" 
+                                name="selectedProducts[]" 
+                                value="{{this._id}}" 
+                                {{#if (lookup ../productMap this._id)}}checked{{/if}}>
+                        </td>
+                        <td class="manage-product-name">{{this.name}}</td>
+                        <td class="text-center">{{formatPrice this.price}}</td>
+                        <td>
+                            <input class="form-control" type="number" step="1000"
+                                name="salePrices[p{{this._id}}]"
+                                value="{{lookup ../productMap this._id}}"
+                                placeholder="Nhập giá KM (nếu có)">
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-success">Lưu</button>
+        </form>
+    </div>
+</div>

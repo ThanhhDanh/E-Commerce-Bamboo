@@ -12,10 +12,12 @@ const ordersRouter = require('./orders');
 const chatRouter = require('./chat');
 const webhookRouter = require('./webhook');
 const indexRouterAPI = require('../routes/api/index');
+const campaignRouter = require('./campaigns');
 
 function route(app) {
     app.use('/api/', indexRouterAPI);
 
+    app.use('/campaigns', campaignRouter);
     app.use('/webhook', webhookRouter);
     app.use('/chat', chatRouter);
     app.use('/orders', ordersRouter);

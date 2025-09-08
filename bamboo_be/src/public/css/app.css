@@ -221,6 +221,11 @@ html *::-webkit-scrollbar-track {
   background-color: rgb(220, 220, 220);
 }
 
+.table-img {
+  width: 100px;
+  height: 100px;
+}
+
 .table-name {
   width: 200px;
   display: -webkit-box;
@@ -1194,6 +1199,12 @@ html *::-webkit-scrollbar-track {
 .unread-message .badge-soft-danger {
   color: #ef476f;
   background-color: rgba(239, 71, 111, 0.18);
+}
+
+.content-wrapper .container-fluid .table .manage-product-name {
+  width: 100px;
+  max-width: 100%;
+  white-space: normal;
 }
 
 /*# sourceMappingURL=app.css.map */
