@@ -209,6 +209,20 @@
                 </ul>
               </div>
             </li>
+            <li class="nav-item {{isActive currentPath '/campaigns/'}}">
+              <a class="nav-link" data-bs-toggle="collapse" href="#campaign" aria-expanded="false" aria-controls="campaign">
+                <span class="menu-title">Chiến dịch</span>
+                <i class="menu-arrow"></i>
+                <i class="mdi mdi-lock menu-icon"></i>
+              </a>
+              <div class="collapse" id="campaign">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="/campaigns"> Quản lý chiến dịch </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
           </ul>
         </nav>
          <div class="main-panel">
@@ -249,6 +263,9 @@
         {{!-- Flatpickr --}}
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+
+        {{!-- Dayjs --}}
+        <script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
 
         <script>
           document.addEventListener('DOMContentLoaded', function() {
