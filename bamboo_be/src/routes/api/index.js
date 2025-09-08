@@ -24,7 +24,7 @@ router.get('/genders', productsController.indexGender);
 router.get('/sizes', productsController.indexSize);
 
 // API Campaigns
-router.get('/campaigns/campaign-with-products', campaignsController.campaignWithProduct);
+router.get('/campaigns/:campaignId/products', campaignsController.campaignWithProduct);
 
 // API Auth
 router.post('/login', apiAuthController.login);

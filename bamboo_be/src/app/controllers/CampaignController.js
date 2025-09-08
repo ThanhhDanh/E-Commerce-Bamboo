@@ -5,10 +5,10 @@ const Products = require('../models/Products');
 
 class CampaignController {
     //API Frontend
-    //[GET] /campaigns/campaign-with-products
+    //[GET] /campaigns/:campaignId/products
     async campaignWithProduct(req, res, next) {
         try {
-            const campaignId = req.params.id;
+            const campaignId = req.params.campaignId;
             const campaign = await Campaign.findById(campaignId);
             if (!campaign) return res.status(404).json({ message: 'Không tìm thấy campaign' });
 
