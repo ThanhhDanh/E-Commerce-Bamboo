@@ -19,7 +19,7 @@
         <h1 class='text-center'>Thêm chiến dịch</h1>
         <form method='POST' action='/campaigns/store'>
             <div class='row'>
-                <div class='col-sm-12 col-md-6'>
+                <div class='col-sm-12 col-md-4'>
                     <div class='mb-3'>
                         <label for='name' class='form-label'>Tên chiến dịch</label>
                         <input
@@ -44,6 +44,17 @@
                         <input type='date' class='form-control flatpickr' id='endDate' name='endDate' required />
                     </div>
                 </div>
+                <div class='col-sm-12 col-md-2'>
+                    <div class='mb-3'>
+                        <label for='type' class='form-label'>Loại chiến dịch</label>
+                        <select id='type' class='form-select' aria-label='Type'>
+                            <option selected value='sale'>Sale</option>
+                            <option value='flash'>Flash</option>
+                            <option value='weekly'>Weekly</option>
+                            <option value='voucher'>Voucher</option>
+                        </select>
+                    </div>
+                </div>
             </div>
             <button type='submit' class='btn btn-success btn-lg'>Thêm chiến dịch</button>
         </form>
@@ -57,6 +68,7 @@
                     <th>#</th>
                     <th>Tên chiến dịch</th>
                     <th>Thời gian</th>
+                    <th>Loại chiến dịch</th>
                     <th>Ngày tạo</th>
                     <th>Hành động</th>
                 </tr>
@@ -69,6 +81,7 @@
                         <td class='cell-dates'>{{formatDate this.startDate 'll'}}
                             -
                             {{formatDate this.endDate 'll'}}</td>
+                        <td class='cell-type'>{{this.type}}</td>
                         <td class='cell-created'>{{formatDate this.createdAt 'll'}}</td>
                         <td class='cell-actions'>
                             <button class='btn btn-warning btn-sm btn-edit'>

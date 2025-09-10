@@ -1445,6 +1445,11 @@ html *::-webkit-scrollbar-track {
     }
 }
 
+// /campaigns
+.form-select:focus {
+    box-shadow: none !important;
+}
+
 // /campaigns/manage-products.hbs
 .content-wrapper {
     .container-fluid {

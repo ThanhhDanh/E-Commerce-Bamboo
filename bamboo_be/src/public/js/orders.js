@@ -138,12 +138,14 @@ document.getElementById('form').addEventListener('submit', function (e) {
             unitPrice,
             tax: 0.01,
             discountId: parseInt(document.getElementById('discountId').value),
-            methodPayment: document.getElementById('methodPayment')?.value || 'Cash',
-            statusPayment: document.getElementById('statusPayment')?.value || 'Pending',
+            // methodPayment: document.getElementById('methodPayment')?.value || 'Cash',
+            // statusPayment: document.getElementById('statusPayment')?.value || 'Pending',
             colorIds: [parseInt(colorId)],
             sizeIds: [parseInt(sizeId)],
         });
     });
+
+    const methodPayment = document.getElementById('methodPayment')?.value || '';
 
     const data = {
         name: document.getElementById('name').value,
@@ -152,25 +154,58 @@ document.getElementById('form').addEventListener('submit', function (e) {
         signature: document.getElementById('signature')?.value || '',
         discountId: document.getElementById('discountId').value,
         statusPayment: document.getElementById('statusPayment')?.value || 'Pending',
+        methodPayment,
         orderDetails: orderDetails,
     };
 
-    fetch('/orders/store', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-        .then((res) => res.json())
-        .then((resData) => {
-            if (resData.success) {
-                window.location.href = resData.redirectUrl;
-            }
-        })
-        .catch((err) => {
-            console.error(err);
-        });
+    switch (methodPayment) {
+        case 'Cash':
+            fetch('/orders/store', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then((res) => res.json())
+                .then((resData) => {
+                    if (resData.success) {
+                        window.location.href = '/orders/show';
+                    }
+                })
+                .catch((err) => {
+                    console.error('Lỗi thanh toán Cash: ', err);
+                });
+            break;
+
+        case 'Momo':
+            fetch('/api/payment/momo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: data.name,
+                    orderInfo: data.description,
+                    amount: data.amount,
+                    discountId: data.discountId,
+                    signatureName: data.signature,
+                    methodPayment: 'Momo',
+                    orderDetails: data.orderDetails,
+                }),
+            })
+                .then((res) => res.json())
+                .then((resData) => {
+                    if (resData.payUrl) {
+                        window.location.href = resData.payUrl;
+                    }
+                })
+                .catch((err) => {
+                    console.log('Lỗi thanh toán MoMo: ', err);
+                });
+            break;
+
+        default:
+            break;
+    }
 });
 
 // Hàm xử lý gắn thông tin người dùng khi đã chọn
