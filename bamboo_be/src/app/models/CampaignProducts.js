@@ -11,6 +11,7 @@ const CampaignProduct = new Schema(
         _id: { type: Number },
         campaignId: { type: Number, ref: 'Campaign', required: true },
         productId: { type: Number, ref: 'Product', required: true },
+        discountId: { type: Number, ref: 'Discount', default: null },
         // nếu muốn override giá trong campaign thì thêm field này
         salePrice: { type: Number, default: null },
     },

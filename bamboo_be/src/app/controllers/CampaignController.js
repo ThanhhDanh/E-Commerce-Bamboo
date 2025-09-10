@@ -2,6 +2,7 @@ const Campaign = require('../models/Campaigns');
 const { mongodbToObject, mutipleMongooseToObject } = require('../../util/mongoose');
 const CampaignProducts = require('../models/CampaignProducts');
 const Products = require('../models/Products');
+const Discounts = require('../models/Discounts');
 
 class CampaignController {
     //API Frontend
@@ -83,7 +84,7 @@ class CampaignController {
 
     //[PUT] /campaigns/:id/edit
     update(req, res, next) {
-        Campaign.findByIdAndUpdate(req.params.id, req.body)
+        Campaign.findByIdAndUpdate(req.params.id, req.body, { new: true })
             .then((updated) => res.json(updated))
             .catch(next);
     }
@@ -99,19 +100,32 @@ class CampaignController {
     async manageProducts(req, res, next) {
         try {
             const campaign = await Campaign.findById(req.params.id);
-            const products = await Products.find({});
-            const campaignProducts = await CampaignProducts.find({ campaignId: campaign._id });
+            const products = await Products.find({}).lean();
+            const discounts = await Discounts.find({}).lean();
+            const campaignProducts = await CampaignProducts.find({ campaignId: campaign._id }).lean();
 
             // Map productId -> salePrice
             const productMap = {};
             campaignProducts.forEach((cp) => {
-                productMap[cp.productId] = cp.salePrice;
+                productMap[cp.productId] = {
+                    salePrice: cp.salePrice,
+                    discountId: cp.discountId || null,
+                };
             });
-            console.log(campaign, products, productMap);
+
+            //Gắn vào products
+            products.forEach((p) => {
+                if (productMap[p._id]) {
+                    p.salePrice = productMap[p._id].salePrice;
+                    p.selectedDiscountId = productMap[p._id].discountId;
+                    p.checked = true;
+                }
+            });
+
             res.render('campaigns/manage-products', {
-                campaign: mongodbToObject(campaign),
-                products: mutipleMongooseToObject(products),
-                productMap,
+                campaign,
+                products,
+                discounts,
             });
         } catch (err) {
             next(err);
@@ -123,23 +137,39 @@ class CampaignController {
         try {
             console.log(req.body);
 
-            const { selectedProducts = [], salePrices = {} } = req.body;
+            const { selectedProducts = [], salePrices = {}, discounts = {} } = req.body;
             const campaignId = req.params.id;
 
             // Xoá hết record cũ của campaign này
             await CampaignProducts.deleteMany({ campaignId });
 
             // Insert lại theo form submit
-            const bulk = selectedProducts.map((productId) => {
-                const key = 'p' + productId;
-                const rawSalePrice = salePrices[key];
+            const bulk = await Promise.all(
+                selectedProducts.map(async (productId) => {
+                    const key = 'p' + productId;
+                    const rawSalePrice = salePrices[key];
+                    const discountId = discounts[key] && discounts[key] !== '' ? discounts[key] : null;
 
-                return {
-                    campaignId: Number(campaignId),
-                    productId: Number(productId),
-                    salePrice: rawSalePrice && rawSalePrice.trim() !== '' ? Number(rawSalePrice) : null,
-                };
-            });
+                    let finalSalePrice = null;
+
+                    if (rawSalePrice && rawSalePrice.trim() !== '') {
+                        finalSalePrice = Number(rawSalePrice);
+                    } else if (discountId) {
+                        const discount = await Discount.findById(discountId);
+                        const product = await Products.findById(productId);
+                        if (discount && product) {
+                            finalSalePrice = Math.round(product.price * (1 - discount.percent / 100));
+                        }
+                    }
+
+                    return {
+                        campaignId,
+                        productId,
+                        salePrice: finalSalePrice,
+                        discountId,
+                    };
+                }),
+            );
             if (bulk.length) await CampaignProducts.insertMany(bulk);
 
             res.redirect('/campaigns');

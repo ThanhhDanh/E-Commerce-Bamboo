@@ -6,6 +6,7 @@ const productsController = require('../../app/controllers/ProductController');
 const campaignsController = require('../../app/controllers/CampaignController');
 const apiAuthController = require('../../app/controllers/ApiAuthController');
 const authenticateToken = require('../../app/middlewares/authenticateToken');
+const ordersController = require('../../app/controllers/OrdersController');
 
 // API routes
 
@@ -25,6 +26,10 @@ router.get('/sizes', productsController.indexSize);
 
 // API Campaigns
 router.get('/campaigns/:campaignId/products', campaignsController.campaignWithProduct);
+
+// API Orders
+router.post('/payment/momo', ordersController.methodMomoPayment);
+router.post('/payment/momo-ipn', ordersController.momoIpn);
 
 // API Auth
 router.post('/login', apiAuthController.login);

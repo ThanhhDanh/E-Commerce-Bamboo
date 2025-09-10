@@ -9,8 +9,172 @@ const decrypt = require('../../util/decrypt');
 const Users = require('../models/Users');
 const encrypt = require('../../util/encrypt');
 const moment = require('moment');
+const crypto = require('crypto');
+const https = require('https');
+const { tryCatch } = require('bullmq');
 
 class OrdersController {
+    //API
+    //[POST] /payment/momo
+    async methodMomoPayment(req, res, next) {
+        try {
+            const { userId, orderInfo, amount, methodPayment, discountId, signatureName, orderDetails = [] } = req.body;
+
+            const partnerCode = 'MOMO';
+            const accessKey = 'F8BBA842ECF85';
+            const secretkey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
+
+            const requestId = partnerCode + new Date().getTime();
+            const redirectUrl = 'http://localhost:5173/payment/momo-return'; // FE redirect
+            const ipnUrl = 'https://e-commerce-bamboo.onrender.com/api/payment/momo-ipn'; // BE callback
+            const requestType = 'captureWallet';
+
+            const encryptedSignature = encrypt(signatureName);
+
+            //Tạo Order trước để lấy id
+            const order = await Orders.create({
+                userId,
+                description: orderInfo,
+                discountId,
+                methodPayment: methodPayment,
+                statusPayment: 'Pending',
+                totalAmount: amount,
+                signature: encryptedSignature,
+            });
+
+            const details = orderDetails.map((p) => ({
+                orderId: order._id,
+                productId: p.productId,
+                discountId,
+                quantity: p.quantity,
+                unitPrice: p.unitPrice,
+                tax: p.tax,
+                statusPayment: 'Pending',
+                methodPayment,
+                sizeIds: p.sizeIds || [],
+                colorIds: p.colorIds || [],
+            }));
+            await OrderDetails.insertMany(details);
+
+            const orderId = order._id.toString();
+            const extraData = JSON.stringify({
+                userId,
+                orderId,
+            });
+
+            // raw signature
+            const rawSignature =
+                'accessKey=' +
+                accessKey +
+                '&amount=' +
+                amount +
+                '&extraData=' +
+                extraData +
+                '&ipnUrl=' +
+                ipnUrl +
+                '&orderId=' +
+                orderId +
+                '&orderInfo=' +
+                orderInfo +
+                '&partnerCode=' +
+                partnerCode +
+                '&redirectUrl=' +
+                redirectUrl +
+                '&requestId=' +
+                requestId +
+                '&requestType=' +
+                requestType;
+
+            // ký HMAC SHA256
+            const signature = crypto.createHmac('sha256', secretkey).update(rawSignature).digest('hex');
+
+            const requestBody = JSON.stringify({
+                partnerCode,
+                accessKey,
+                requestId,
+                amount,
+                orderId,
+                orderInfo,
+                redirectUrl,
+                ipnUrl,
+                extraData,
+                requestType,
+                signature,
+                lang: 'en',
+            });
+
+            const options = {
+                hostname: 'test-payment.momo.vn',
+                port: 443,
+                path: '/v2/gateway/api/create',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(requestBody),
+                },
+            };
+
+            const momoReq = https.request(options, (momoRes) => {
+                let data = '';
+                momoRes.on('data', (chunk) => {
+                    data += chunk;
+                });
+                momoRes.on('end', () => {
+                    const result = JSON.parse(data);
+                    return res.json(result); // trả về cho FE
+                });
+            });
+
+            momoReq.on('error', (e) => {
+                console.error(`problem with request: ${e.message}`);
+                return res.status(500).json({ success: false, message: e.message });
+            });
+
+            momoReq.write(requestBody);
+            momoReq.end();
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ success: false, message: 'Lỗi tạo thanh toán MoMo' });
+        }
+    }
+
+    async momoIpn(req, res, next) {
+        try {
+            console.log('IPN từ MoMo: ', req.body);
+
+            const { resultCode, amount, extraData } = req.body;
+            const parsed = extraData ? JSON.parse(extraData) : {};
+            const { orderId } = parsed;
+
+            if (!orderId) {
+                return res.status(400).json({ message: 'Thiếu orderId' });
+            }
+
+            if (resultCode === 0) {
+                // Thanh toán thành công → update Order + OrderDetails
+                await Orders.findByIdAndUpdate(orderId, {
+                    statusPayment: 'Paid',
+                    totalAmount: amount,
+                });
+
+                await OrderDetails.updateMany({ orderId }, { statusPayment: 'Paid' });
+
+                return res.json({ message: 'Thanh toán MoMo thành công' });
+            }
+
+            // Thanh toán thất bại → update Order + OrderDetails
+            await Orders.findByIdAndUpdate(orderId, { statusPayment: 'Failed' });
+            await OrderDetails.updateMany({ orderId }, { statusPayment: 'Failed' });
+
+            return res.status(400).json({ message: 'Thanh toán MoMo thất bại' });
+        } catch (err) {
+            console.error('Error in MoMo IPN:', err);
+            return res.status(500).json({ message: 'Backend lỗi' });
+        }
+    }
+
+    // ================================================================================================
+
     // [GET] /orders/show
     show(req, res, next) {
         Orders.find({})
@@ -141,7 +305,7 @@ class OrdersController {
 
             await OrderDetails.insertMany(mappedDetails);
 
-            return res.json({ success: true, redirectUrl: '/orders/show' });
+            return res.json({ success: true, order: savedOrder });
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Lỗi tạo hóa đơn' });
