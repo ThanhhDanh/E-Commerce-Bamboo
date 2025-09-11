@@ -10,8 +10,7 @@ const Users = require('../models/Users');
 const encrypt = require('../../util/encrypt');
 const moment = require('moment');
 const crypto = require('crypto');
-const https = require('https');
-const { tryCatch } = require('bullmq');
+const axios = require('axios');
 
 class OrdersController {
     //API
@@ -88,7 +87,7 @@ class OrdersController {
             // ký HMAC SHA256
             const signature = crypto.createHmac('sha256', secretkey).update(rawSignature).digest('hex');
 
-            const requestBody = JSON.stringify({
+            const requestBody = {
                 partnerCode,
                 accessKey,
                 requestId,
@@ -101,37 +100,17 @@ class OrdersController {
                 requestType,
                 signature,
                 lang: 'en',
-            });
-
-            const options = {
-                hostname: 'test-payment.momo.vn',
-                port: 443,
-                path: '/v2/gateway/api/create',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(requestBody),
-                },
             };
 
-            const momoReq = https.request(options, (momoRes) => {
-                let data = '';
-                momoRes.on('data', (chunk) => {
-                    data += chunk;
-                });
-                momoRes.on('end', () => {
-                    const result = JSON.parse(data);
-                    return res.json(result); // trả về cho FE
-                });
+            console.log(requestBody);
+
+            const response = await axios.post('https://test-payment.momo.vn/v2/gateway/api/create', requestBody, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
 
-            momoReq.on('error', (e) => {
-                console.error(`problem with request: ${e.message}`);
-                return res.status(500).json({ success: false, message: e.message });
-            });
-
-            momoReq.write(requestBody);
-            momoReq.end();
+            return res.status(200).json(response.data.payUrl);
         } catch (err) {
             console.error(err);
             return res.status(500).json({ success: false, message: 'Lỗi tạo thanh toán MoMo' });
