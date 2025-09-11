@@ -147,12 +147,6 @@ document.getElementById('form').addEventListener('submit', function (e) {
 
     const methodPayment = document.getElementById('methodPayment')?.value || '';
 
-    const totalAmount = orderDetails.reduce((sum, item) => {
-        const itemTotal = item.unitPrice * item.quantity;
-        const tax = item.tax ? itemTotal * item.tax : 0;
-        return sum + itemTotal + tax;
-    }, 0);
-
     const data = {
         name: document.getElementById('name').value,
         phone: document.getElementById('phone').value,
@@ -162,7 +156,6 @@ document.getElementById('form').addEventListener('submit', function (e) {
         statusPayment: document.getElementById('statusPayment')?.value || 'Pending',
         methodPayment,
         orderDetails: orderDetails,
-        amount: totalAmount,
     };
 
     switch (methodPayment) {

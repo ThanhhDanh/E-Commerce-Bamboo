@@ -17,7 +17,7 @@ class OrdersController {
     //[POST] /payment/momo
     async methodMomoPayment(req, res, next) {
         try {
-            const { userId, orderInfo, amount, methodPayment, discountId, signatureName, orderDetails = [] } = req.body;
+            const { userId, orderInfo, methodPayment, discountId, signatureName, orderDetails = [] } = req.body;
 
             const partnerCode = 'MOMO';
             const accessKey = 'F8BBA842ECF85';
@@ -27,6 +27,25 @@ class OrdersController {
             const redirectUrl = 'http://localhost:5173/payment/momo-return'; // FE redirect
             const ipnUrl = 'https://e-commerce-bamboo.onrender.com/api/payment/momo-ipn'; // BE callback
             const requestType = 'captureWallet';
+
+            let totalAmount = orderDetails.reduce((sum, item) => {
+                const itemTotal = item.unitPrice * item.quantity;
+                const tax = item.tax ? itemTotal * item.tax : 0;
+                return sum + itemTotal + tax;
+            }, 0);
+
+            if (discountId) {
+                const discount = await Discounts.findById(discountId);
+                if (discount) {
+                    if (discount.type === 'percent') {
+                        totalAmount = totalAmount * (1 - discount.value / 100);
+                    } else {
+                        totalAmount = Math.max(0, totalAmount - discount.value);
+                    }
+                }
+            }
+
+            const amount = Math.round(totalAmount);
 
             const encryptedSignature = encrypt(signatureName);
 
@@ -110,7 +129,10 @@ class OrdersController {
                 },
             });
 
-            return res.status(200).json(response.data.payUrl);
+            return res.status(200).json({
+                success: true,
+                payUrl: response.data.payUrl,
+            });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ success: false, message: 'Lỗi tạo thanh toán MoMo' });
