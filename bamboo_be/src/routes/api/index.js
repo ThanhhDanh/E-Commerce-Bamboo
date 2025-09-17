@@ -30,6 +30,7 @@ router.get('/campaigns/:campaignId/products', campaignsController.campaignWithPr
 // API Orders
 router.post('/payment/momo', ordersController.methodMomoPayment);
 router.post('/payment/momo-ipn', ordersController.momoIpn);
+router.put('/payment/momo/:id/cancel', ordersController.cancelMomoPayment);
 
 // API Auth
 router.post('/login', apiAuthController.login);

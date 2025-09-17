@@ -170,10 +170,12 @@ document.getElementById('form').addEventListener('submit', function (e) {
                 .then((res) => res.json())
                 .then((resData) => {
                     if (resData.success) {
+                        showSuccessToast('Tạo hóa đơn thành công!');
                         window.location.href = '/orders/show';
                     }
                 })
                 .catch((err) => {
+                    showErrorToast('Lỗi thanh toán Cash: ', err);
                     console.error('Lỗi thanh toán Cash: ', err);
                 });
             break;

@@ -261,7 +261,22 @@
                                     <a href='/orders/edit/{{this._id}}' class='btn-action'>
                                         <i class='mdi mdi-pencil'></i>
                                     </a>
-                                    <a class='btn-action' onclick='deleteOrder({{this._id}})'>
+                                    <a
+                                        href='#'
+                                        class='btn-action'
+                                        data-bs-toggle='modal'
+                                        data-bs-target='#put-order-cancel-modal'
+                                        data-id='{{this._id}}'
+                                    >
+                                        <i class='fa-solid fa-xmark'></i>
+                                    </a>
+                                    <a
+                                        class='btn-action'
+                                        href=''
+                                        data-id='{{this._id}}'
+                                        data-bs-toggle='modal'
+                                        data-bs-target='#delete-order-modal'
+                                    >
                                         <i class='mdi mdi-delete'></i>
                                     </a>
                                 </td>
@@ -278,3 +293,121 @@
         </div>
     </div>
 </div>
+
+{{! Confirm delete }}
+<div class='modal fade' id='delete-order-modal' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title' id='exampleModalLabel'>Xóa hóa đơn??</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                Bạn có chắc chắn xóa hóa đơn này!!!
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Hủy</button>
+                <button id='btn-delete-order' type='button' class='btn btn-danger'>Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! DELETE form }}
+<form method='POST' name='delete-order-form'></form>
+
+{{! Confirm put }}
+<div
+    class='modal fade'
+    id='put-order-cancel-modal'
+    tabindex='-1'
+    aria-labelledby='exampleModalLabel'
+    aria-hidden='true'
+>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h1 class='modal-title' id='exampleModalLabel'>Hủy hóa đơn??</h1>
+                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div class='modal-body'>
+                Bạn có chắc chắn hủy thanh toán hóa đơn này!!!
+            </div>
+            <div class='modal-footer'>
+                <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Không hủy</button>
+                <button id='btn-put-order-cancel' type='button' class='btn btn-danger'>Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! PUT form }}
+<form method='POST' name='put-order-cancel-form'></form>
+
+{{! prettier-ignore }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var orderIdCancel;
+        var orderId;
+        var deleteForm = document.forms['delete-order-form'];
+        var btnDeleteOrder = document.getElementById('btn-delete-order');
+        var putFormCancel = document.forms['put-order-cancel-form'];
+        var btnPutOrderCancel = document.getElementById('btn-put-order-cancel');
+
+        // Lấy id đơn hàng khi mở modal
+        $('#put-order-cancel-modal').on('show.bs.modal', function (e) {
+            var button = $(e.relatedTarget);
+            orderIdCancel = button.data('id');
+        });
+
+        // Xử lý hủy đơn hàng
+        btnPutOrderCancel.onclick = function () {
+            putFormCancel.action = '/orders/' + orderIdCancel + '/cancel?_method=PUT';
+            putFormCancel.submit();
+        };
+
+        // Xử lý thông báo từ query string
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get('success')) {
+            showSuccessToast(params.get('success'));
+            // Xóa query sau khi show
+            params.delete('success');
+            window.history.replaceState(
+                {},
+                '',
+                window.location.pathname + (params.toString() ? '?' + params.toString() : ''),
+            );
+        }
+
+        if (params.get('error')) {
+            showErrorToast(params.get('error'));
+            // Xóa query sau khi show
+            params.delete('error');
+            window.history.replaceState(
+                {},
+                '',
+                window.location.pathname + (params.toString() ? '?' + params.toString() : ''),
+            );
+        }
+
+        // Modal xoá đơn hàng
+        $('#delete-order-modal').on('show.bs.modal', function (e) {
+            var button = $(e.relatedTarget);
+            orderId = button.data('id');
+        });
+
+        btnDeleteOrder.onclick = async function (e) {
+            e.preventDefault();
+            const response = await fetch('/orders/' + orderId + '?_method=DELETE', { method: 'POST' });
+            const result = await response.json();
+
+            if (result.success) {
+                showSuccessToast(result.message);
+                setTimeout(() => (window.location.href = '/orders/show'), 1200);
+            } else {
+                showErrorToast(result.message);
+            }
+        };
+    });
+</script>
