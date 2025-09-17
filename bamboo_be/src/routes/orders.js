@@ -27,6 +27,8 @@ router.get('/create', ordersController.create);
 //     ordersController.store,
 // );
 router.post('/store', ordersController.store);
+router.put('/:id/cancel', ordersController.cancelOrder);
+router.delete('/:id', ordersController.hardDeleteOrder);
 router.get('/detail/:slug', ordersController.detail);
 
 module.exports = router;

@@ -13,6 +13,7 @@ const Order = new Schema(
         signature: { type: String },
         description: { type: String },
         status: { type: String },
+        methodPayment: { type: String },
         userId: { type: Number, ref: 'User', required: 'true' },
         slug: { type: String, slug: 'signature', unique: true },
     },

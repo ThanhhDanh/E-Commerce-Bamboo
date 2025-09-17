@@ -17,7 +17,7 @@ class OrdersController {
     //[POST] /payment/momo
     async methodMomoPayment(req, res, next) {
         try {
-            const { userId, orderInfo, amount, methodPayment, discountId, signatureName, orderDetails = [] } = req.body;
+            const { userId, orderInfo, methodPayment, discountId, signatureName, orderDetails = [] } = req.body;
 
             const partnerCode = 'MOMO';
             const accessKey = 'F8BBA842ECF85';
@@ -28,6 +28,22 @@ class OrdersController {
             const ipnUrl = 'https://e-commerce-bamboo.onrender.com/api/payment/momo-ipn'; // BE callback
             const requestType = 'captureWallet';
 
+            let totalAmount = orderDetails.reduce((sum, item) => {
+                const itemTotal = item.unitPrice * item.quantity;
+                const tax = item.tax ? itemTotal * item.tax : 0;
+                return sum + itemTotal + tax;
+            }, 0);
+
+            if (discountId) {
+                const discount = await Discounts.findById(discountId);
+                if (discount) {
+                    const discountPercent = Number(discount.price) || 0;
+                    totalAmount = totalAmount * (1 - discountPercent / 100);
+                }
+            }
+
+            const amount = Math.round(totalAmount);
+
             const encryptedSignature = encrypt(signatureName);
 
             //Tạo Order trước để lấy id
@@ -35,8 +51,8 @@ class OrdersController {
                 userId,
                 description: orderInfo,
                 discountId,
-                methodPayment: methodPayment,
-                statusPayment: 'Pending',
+                status: 'Pending',
+                methodPayment,
                 totalAmount: amount,
                 signature: encryptedSignature,
             });
@@ -61,20 +77,25 @@ class OrdersController {
                 orderId,
             });
 
+            const rawOrderId = order._id.toString();
+            const momoOrderId = `MOMO_${rawOrderId}_${Date.now()}`;
+            const amountStr = String(amount);
+            const orderInfoStr = orderInfo || `Thanh toán đơn hàng #${rawOrderId}`;
+
             // raw signature
             const rawSignature =
                 'accessKey=' +
                 accessKey +
                 '&amount=' +
-                amount +
+                amountStr +
                 '&extraData=' +
                 extraData +
                 '&ipnUrl=' +
                 ipnUrl +
                 '&orderId=' +
-                orderId +
+                momoOrderId +
                 '&orderInfo=' +
-                orderInfo +
+                orderInfoStr +
                 '&partnerCode=' +
                 partnerCode +
                 '&redirectUrl=' +
@@ -91,15 +112,15 @@ class OrdersController {
                 partnerCode,
                 accessKey,
                 requestId,
-                amount,
-                orderId,
-                orderInfo,
+                amount: amountStr,
+                orderId: momoOrderId,
+                orderInfo: orderInfoStr,
                 redirectUrl,
                 ipnUrl,
                 extraData,
                 requestType,
                 signature,
-                lang: 'en',
+                lang: 'vi',
             };
 
             console.log(requestBody);
@@ -110,7 +131,10 @@ class OrdersController {
                 },
             });
 
-            return res.status(200).json(response.data.payUrl);
+            return res.status(200).json({
+                success: true,
+                payUrl: response.data.payUrl,
+            });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ success: false, message: 'Lỗi tạo thanh toán MoMo' });
@@ -134,6 +158,7 @@ class OrdersController {
                 await Orders.findByIdAndUpdate(orderId, {
                     statusPayment: 'Paid',
                     totalAmount: amount,
+                    transId: req.body.transId,
                 });
 
                 await OrderDetails.updateMany({ orderId }, { statusPayment: 'Paid' });
@@ -149,6 +174,80 @@ class OrdersController {
         } catch (err) {
             console.error('Error in MoMo IPN:', err);
             return res.status(500).json({ message: 'Backend lỗi' });
+        }
+    }
+
+    // [PUT] /payment/momo/:id/cancel
+    async cancelMomoPayment(req, res) {
+        try {
+            const { id } = req.params;
+            const order = await Orders.findById(id);
+            if (!order) {
+                return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+            }
+
+            // Nếu order chưa thanh toán
+            if (order.statusPayment === 'Pending') {
+                order.statusPayment = 'Cancel';
+                await order.save();
+                await OrderDetails.updateMany({ orderId: id }, { statusPayment: 'Cancel' });
+                return res.json({ success: true, message: 'Đã hủy đơn hàng (MoMo Pending)' });
+            }
+
+            // Nếu order đã thanh toán thành công
+            if (order.statusPayment === 'Paid') {
+                // --- Gọi MoMo Refund API ---
+                const partnerCode = 'MOMO';
+                const accessKey = 'F8BBA842ECF85';
+                const secretkey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
+
+                const requestId = partnerCode + new Date().getTime();
+                const refundOrderId = `REFUND_${order._id}_${Date.now()}`;
+                const transId = order.transId; // Lưu transId từ IPN trước đó
+
+                const amount = String(order.totalAmount);
+
+                const rawSignature =
+                    `accessKey=${accessKey}&amount=${amount}&description=Hoan tien don hang ${order._id}` +
+                    `&orderId=${refundOrderId}&partnerCode=${partnerCode}&requestId=${requestId}&transId=${transId}`;
+
+                const signature = crypto.createHmac('sha256', secretkey).update(rawSignature).digest('hex');
+
+                const requestBody = {
+                    partnerCode,
+                    orderId: refundOrderId,
+                    requestId,
+                    amount,
+                    transId,
+                    lang: 'vi',
+                    description: `Hoàn tiền đơn hàng #${order._id}`,
+                    signature,
+                    accessKey,
+                };
+
+                const response = await axios.post('https://test-payment.momo.vn/v2/gateway/api/refund', requestBody, {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                console.log('Refund response:', response.data);
+
+                if (response.data.resultCode === 0) {
+                    order.statusPayment = 'Refunded';
+                    await order.save();
+                    await OrderDetails.updateMany({ orderId: id }, { statusPayment: 'Refunded' });
+                    return res.json({ success: true, message: 'Hoàn tiền MoMo thành công' });
+                } else {
+                    return res
+                        .status(400)
+                        .json({ success: false, message: 'Hoàn tiền MoMo thất bại', momo: response.data });
+                }
+            }
+
+            // Nếu đã Cancel hoặc Failed thì không cho hủy nữa
+            return res.status(400).json({ message: 'Đơn hàng không thể hủy' });
+        } catch (err) {
+            console.error('Cancel MoMo error:', err);
+            return res.status(500).json({ message: 'Server lỗi khi hủy MoMo' });
         }
     }
 
@@ -231,7 +330,15 @@ class OrdersController {
     // [POST] /orders/store
     async store(req, res, next) {
         try {
-            const { name, statusPayment, description, discountId, signature, orderDetails = [] } = req.body;
+            const {
+                name,
+                statusPayment,
+                methodPayment,
+                description,
+                discountId,
+                signature,
+                orderDetails = [],
+            } = req.body;
 
             if (!Array.isArray(orderDetails) || orderDetails.length === 0) {
                 return res.status(400).json({ message: 'Order details are required' });
@@ -263,6 +370,7 @@ class OrdersController {
                 description,
                 discountId,
                 status: statusPayment,
+                methodPayment: methodPayment,
                 signature: encryptedSignature,
                 totalAmount,
             });
@@ -273,8 +381,8 @@ class OrdersController {
             const mappedDetails = orderDetails.map((detail) => ({
                 quantity: Number(detail.quantity),
                 unitPrice: Number(detail.unitPrice),
-                statusPayment: detail.statusPayment,
-                methodPayment: detail.methodPayment,
+                statusPayment: statusPayment,
+                methodPayment: methodPayment,
                 discountId: Number(detail.discountId),
                 productId: Number(detail.productId),
                 orderId: savedOrder._id,
@@ -326,6 +434,51 @@ class OrdersController {
             });
         } catch (error) {
             next(error);
+        }
+    }
+
+    // [PUT] /orders/:id/cancel
+    async cancelOrder(req, res) {
+        try {
+            const { id } = req.params;
+            const order = await Orders.findById(id);
+
+            if (!order) return res.redirect('/orders/show?error=' + encodeURIComponent('Không tìm thấy đơn hàng'));
+
+            if (order.methodPayment === 'Cash') {
+                if (order.status === 'Pending') {
+                    order.status = 'Cancel';
+                    await order.save();
+                    await OrderDetails.updateMany({ orderId: id }, { statusPayment: 'Cancel' });
+
+                    return res.redirect('/orders/show?success=' + encodeURIComponent('Đã hủy đơn (Cash)'));
+                }
+                return res.redirect('/orders/show?error=' + encodeURIComponent('Đơn Cash này không thể hủy'));
+            }
+
+            res.redirect('/orders/show?error=' + encodeURIComponent('Sai phương thức thanh toán'));
+        } catch (err) {
+            console.error(err);
+            res.redirect('/orders/show?error=' + encodeURIComponent('Server lỗi'));
+        }
+    }
+
+    //[DELETE] /orders.:id
+    async hardDeleteOrder(req, res) {
+        try {
+            const { id } = req.params;
+
+            const order = await Orders.findByIdAndDelete(id);
+            await OrderDetails.deleteMany({ orderId: id });
+
+            if (!order) {
+                return res.status(404).json({ message: 'Không tìm thấy đơn hàng để xoá' });
+            }
+
+            return res.json({ success: true, message: 'Đã xoá đơn hàng và chi tiết liên quan' });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Lỗi xoá đơn hàng' });
         }
     }
 }
