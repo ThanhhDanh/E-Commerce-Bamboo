@@ -11,9 +11,126 @@ const encrypt = require('../../util/encrypt');
 const moment = require('moment');
 const crypto = require('crypto');
 const axios = require('axios');
+const { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat } = require('vnpay');
 
 class OrdersController {
     //API
+
+    //[POST] /payment/vnpay
+    async methodVnpayPayment(req, res, next) {
+        try {
+            const { userId, orderInfo, methodPayment, discountId, signatureName, orderDetails = [] } = req.body;
+
+            // Tính tổng tiền
+            let totalAmount = orderDetails.reduce((sum, item) => {
+                const itemTotal = item.unitPrice * item.quantity;
+                const tax = item.tax ? itemTotal * item.tax : 0;
+                return sum + itemTotal + tax;
+            }, 0);
+
+            if (discountId) {
+                const discount = await Discounts.findById(discountId);
+                if (discount) {
+                    const discountPercent = Number(discount.price) || 0;
+                    totalAmount = totalAmount * (1 - discountPercent / 100);
+                }
+            }
+
+            const amount = Math.round(totalAmount);
+
+            const encryptedSignature = encrypt(signatureName);
+
+            // Tạo Order trong DB
+            const order = await Orders.create({
+                userId,
+                description: orderInfo,
+                discountId,
+                status: 'Pending',
+                methodPayment,
+                totalAmount: amount,
+                signature: encryptedSignature,
+            });
+
+            const details = orderDetails.map((p) => ({
+                orderId: order._id,
+                productId: p.productId,
+                discountId,
+                quantity: p.quantity,
+                unitPrice: p.unitPrice,
+                tax: p.tax,
+                statusPayment: 'Pending',
+                methodPayment,
+                sizeIds: p.sizeIds || [],
+                colorIds: p.colorIds || [],
+            }));
+            await OrderDetails.insertMany(details);
+
+            // Dùng SDK VNPay
+            const vnpay = new VNPay({
+                tmnCode: 'B2BXHDSS',
+                secureSecret: 'M4HTSPIK5EI9CCYDMTCLY7YLGO0UTXI2',
+                vnpayHost: 'https://sandbox.vnpayment.vn',
+                testMode: true,
+                hashAlgorithm: 'SHA512',
+                enableLog: true,
+            });
+
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const vnpayUrl = await vnpay.buildPaymentUrl({
+                vnp_Amount: amount,
+                vnp_IpAddr: req.ip || '127.0.0.1',
+                vnp_TxnRef: order._id.toString(),
+                vnp_OrderInfo: orderInfo || `Thanh toán đơn hàng #${order._id}`,
+                vnp_OrderType: 'other',
+                vnp_ReturnUrl: 'http://localhost:5173/api/payment/vnpay-return',
+                vnp_Locale: 'vn',
+                vnp_CreateDate: dateFormat(new Date()),
+                vnp_ExpireDate: dateFormat(tomorrow),
+            });
+
+            return res.json({ success: true, payUrl: vnpayUrl });
+        } catch (err) {
+            console.error('VNPay error:', err);
+            return res.status(500).json({ success: false, message: 'Lỗi tạo thanh toán VNPay' });
+        }
+    }
+
+    //[GET] /api/payment/vnpay-return
+    async checkPaymentVNPay(req, res, next) {
+        try {
+            const vnpay = new VNPay({
+                tmnCode: 'B2BXHDSS',
+                secureSecret: 'M4HTSPIK5EI9CCYDMTCLY7YLGO0UTXI2',
+                vnpayHost: 'https://sandbox.vnpayment.vn',
+                testMode: true,
+                hashAlgorithm: 'SHA512',
+            });
+
+            const isValid = vnpay.verifyReturnUrl(req.query);
+            if (!isValid) {
+                return res.status(400).json({ success: false, message: 'Sai chữ ký VNPay' });
+            }
+
+            const orderId = req.query.vnp_TxnRef;
+            const rspCode = req.query.vnp_ResponseCode;
+
+            if (rspCode === '00') {
+                await Orders.findByIdAndUpdate(orderId, { statusPayment: 'Paid' });
+                await OrderDetails.updateMany({ orderId }, { statusPayment: 'Paid' });
+                return res.json({ success: true, message: 'Thanh toán VNPay thành công' });
+            } else {
+                await Orders.findByIdAndUpdate(orderId, { statusPayment: 'Failed' });
+                await OrderDetails.updateMany({ orderId }, { statusPayment: 'Failed' });
+                return res.json({ success: false, message: 'Thanh toán VNPay thất bại' });
+            }
+        } catch (err) {
+            console.error('VNPay return error:', err);
+            return res.status(500).json({ success: false, message: 'Lỗi xử lý VNPay return' });
+        }
+    }
+
     //[POST] /payment/momo
     async methodMomoPayment(req, res, next) {
         try {

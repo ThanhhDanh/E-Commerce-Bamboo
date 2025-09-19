@@ -31,6 +31,8 @@ router.get('/campaigns/:campaignId/products', campaignsController.campaignWithPr
 router.post('/payment/momo', ordersController.methodMomoPayment);
 router.post('/payment/momo-ipn', ordersController.momoIpn);
 router.put('/payment/momo/:id/cancel', ordersController.cancelMomoPayment);
+router.post('/payment/vnpay', ordersController.methodVnpayPayment);
+router.get('/payment/vnpay-return', ordersController.checkPaymentVNPay);
 
 // API Auth
 router.post('/login', apiAuthController.login);
