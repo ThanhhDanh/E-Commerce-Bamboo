@@ -205,6 +205,30 @@ document.getElementById('form').addEventListener('submit', function (e) {
                 });
             break;
 
+        case 'VNPay':
+            fetch('/api/payment/vnpay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: data.name,
+                    orderInfo: data.description,
+                    amount: data.amount,
+                    discountId: data.discountId,
+                    signatureName: data.signature,
+                    methodPayment: 'VNPay',
+                    orderDetails: data.orderDetails,
+                }),
+            })
+                .then((res) => res.json())
+                .then((resData) => {
+                    if (resData.payUrl) {
+                        window.location.href = resData.payUrl;
+                    }
+                })
+                .catch((err) => {
+                    console.log('Lỗi thanh toán VNPay:', err);
+                });
+
         default:
             break;
     }
