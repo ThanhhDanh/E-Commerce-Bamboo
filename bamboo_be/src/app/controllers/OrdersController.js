@@ -84,7 +84,7 @@ class OrdersController {
                 vnp_TxnRef: order._id.toString(),
                 vnp_OrderInfo: orderInfo || `Thanh toán đơn hàng #${order._id}`,
                 vnp_OrderType: 'other',
-                vnp_ReturnUrl: 'http://localhost:5173/api/payment/vnpay-return',
+                vnp_ReturnUrl: 'https://e-commerce-bamboo.onrender.com/api/payment/vnpay-return',
                 vnp_Locale: 'vn',
                 vnp_CreateDate: dateFormat(new Date()),
                 vnp_ExpireDate: dateFormat(tomorrow),
@@ -110,24 +110,38 @@ class OrdersController {
 
             const isValid = vnpay.verifyReturnUrl(req.query);
             if (!isValid) {
-                return res.status(400).json({ success: false, message: 'Sai chữ ký VNPay' });
+                if (req.xhr || req.headers.accept.includes('application/json')) {
+                    return res.status(400).json({ success: false, message: 'Sai chữ ký VNPay' });
+                }
+                return res.redirect('/orders/show?error=' + encodeURIComponent('Sai chữ ký VNPay'));
             }
 
             const orderId = req.query.vnp_TxnRef;
             const rspCode = req.query.vnp_ResponseCode;
 
             if (rspCode === '00') {
-                await Orders.findByIdAndUpdate(orderId, { statusPayment: 'Paid' });
+                await Orders.findByIdAndUpdate(orderId, { status: 'Paid' });
                 await OrderDetails.updateMany({ orderId }, { statusPayment: 'Paid' });
-                return res.json({ success: true, message: 'Thanh toán VNPay thành công' });
+
+                if (req.xhr || req.headers.accept.includes('application/json')) {
+                    return res.json({ success: true, message: 'Thanh toán VNPay thành công' });
+                }
+                return res.redirect('/orders/show?success=' + encodeURIComponent('Thanh toán VNPay thành công'));
             } else {
-                await Orders.findByIdAndUpdate(orderId, { statusPayment: 'Failed' });
+                await Orders.findByIdAndUpdate(orderId, { status: 'Failed' });
                 await OrderDetails.updateMany({ orderId }, { statusPayment: 'Failed' });
-                return res.json({ success: false, message: 'Thanh toán VNPay thất bại' });
+
+                if (req.xhr || req.headers.accept.includes('application/json')) {
+                    return res.json({ success: false, message: 'Thanh toán VNPay thất bại' });
+                }
+                return res.redirect('/orders/show?error=' + encodeURIComponent('Thanh toán VNPay thất bại'));
             }
         } catch (err) {
             console.error('VNPay return error:', err);
-            return res.status(500).json({ success: false, message: 'Lỗi xử lý VNPay return' });
+            if (req.xhr || req.headers.accept.includes('application/json')) {
+                return res.status(500).json({ success: false, message: 'Lỗi xử lý VNPay return' });
+            }
+            return res.redirect('/orders/show?error=' + encodeURIComponent('Lỗi xử lý VNPay return'));
         }
     }
 
@@ -273,7 +287,7 @@ class OrdersController {
             if (resultCode === 0) {
                 // Thanh toán thành công → update Order + OrderDetails
                 await Orders.findByIdAndUpdate(orderId, {
-                    statusPayment: 'Paid',
+                    status: 'Paid',
                     totalAmount: amount,
                     transId: req.body.transId,
                 });

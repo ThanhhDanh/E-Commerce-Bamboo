@@ -198,10 +198,13 @@ document.getElementById('form').addEventListener('submit', function (e) {
                 .then((resData) => {
                     if (resData.payUrl) {
                         window.location.href = resData.payUrl;
+                    } else {
+                        showErrorToast('Không lấy được link thanh toán VNPay');
                     }
                 })
                 .catch((err) => {
                     console.log('Lỗi thanh toán MoMo: ', err);
+                    showErrorToast('Lỗi thanh toán VNPay');
                 });
             break;
 
@@ -228,6 +231,7 @@ document.getElementById('form').addEventListener('submit', function (e) {
                 .catch((err) => {
                     console.log('Lỗi thanh toán VNPay:', err);
                 });
+            break;
 
         default:
             break;
