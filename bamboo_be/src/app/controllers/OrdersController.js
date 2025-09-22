@@ -78,10 +78,12 @@ class OrdersController {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
 
-            const vnpayUrl = await vnpay.buildPaymentUrl({
+            const txnRef = `${order._id}-${Date.now()}`;
+
+            const vnpayUrl = vnpay.buildPaymentUrl({
                 vnp_Amount: amount,
                 vnp_IpAddr: req.ip || '127.0.0.1',
-                vnp_TxnRef: order._id.toString(),
+                vnp_TxnRef: txnRef,
                 vnp_OrderInfo: orderInfo || `Thanh toán đơn hàng #${order._id}`,
                 vnp_OrderType: 'other',
                 vnp_ReturnUrl: 'https://e-commerce-bamboo.onrender.com/api/payment/vnpay-return',
@@ -116,7 +118,8 @@ class OrdersController {
                 return res.redirect('/orders/show?error=' + encodeURIComponent('Sai chữ ký VNPay'));
             }
 
-            const orderId = req.query.vnp_TxnRef;
+            const txnRef = req.query.vnp_TxnRef;
+            const orderId = txnRef.split('-')[0];
             const rspCode = req.query.vnp_ResponseCode;
 
             if (rspCode === '00') {
@@ -155,7 +158,7 @@ class OrdersController {
             const secretkey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
 
             const requestId = partnerCode + new Date().getTime();
-            const redirectUrl = 'http://localhost:5173/payment/momo-return'; // FE redirect
+            const redirectUrl = 'https://e-commerce-bamboo.vercel.app/payment/momo-return'; // FE redirect
             const ipnUrl = 'https://e-commerce-bamboo.onrender.com/api/payment/momo-ipn'; // BE callback
             const requestType = 'captureWallet';
 
