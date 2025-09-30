@@ -1150,7 +1150,7 @@ html *::-webkit-scrollbar-track {
                 .id {
                     font-size: 1.4rem;
                     font-weight: 500;
-                    color: var(--text-primary);
+                    color: #b66dff;
                 }
             }
         }
@@ -1169,7 +1169,7 @@ html *::-webkit-scrollbar-track {
                 h3 {
                     font-size: 1.8rem;
                     font-weight: 500;
-                    color: var(--text-primary);
+                    color: #b66dff;
                     margin: 0 0 5px 30px;
                 }
 
@@ -1187,7 +1187,7 @@ html *::-webkit-scrollbar-track {
             h3 {
                 font-size: 1.5rem;
                 font-weight: 500;
-                color: var(--text-primary);
+                color: #b66dff;
                 margin: 20px 0;
             }
             .container-table {
@@ -1259,11 +1259,10 @@ html *::-webkit-scrollbar-track {
             span {
                 font-size: 1.5rem;
                 font-weight: 500;
-                color: var(--text-primary);
 
                 strong {
                     font-size: 1.4rem;
-                    color: #999;
+                    color: #b66dff;
                 }
             }
         }
@@ -1272,7 +1271,6 @@ html *::-webkit-scrollbar-track {
             span {
                 font-size: 1.5rem;
                 font-weight: 500;
-                color: var(--text-primary);
                 margin-bottom: 10px;
                 display: block;
             }
@@ -1301,7 +1299,7 @@ html *::-webkit-scrollbar-track {
                 }
 
                 .timeline-1 .event {
-                    border-bottom: 1px dashed var(--text-primary);
+                    border-bottom: 1px dashed #b66dff;
                     padding-bottom: 15px;
                     margin-bottom: 15px;
                     position: relative;
@@ -1309,7 +1307,7 @@ html *::-webkit-scrollbar-track {
                     a {
                         font-size: 1.4rem;
                         font-weight: 500;
-                        color: var(--text-primary);
+                        color: #b66dff;
                         transition: all 0.3s ease-in-out;
                         cursor: pointer;
 
@@ -1361,8 +1359,8 @@ html *::-webkit-scrollbar-track {
                 }
 
                 .timeline-1 .event:after {
-                    -webkit-box-shadow: 0 0 0 3px var(--text-primary);
-                    box-shadow: 0 0 0 3px var(--text-primary);
+                    -webkit-box-shadow: 0 0 0 3px #b66dff;
+                    box-shadow: 0 0 0 3px #b66dff;
                     left: -25.8px;
                     background: #fff;
                     border-radius: 50%;

@@ -12,7 +12,7 @@ const Campaign = new Schema(
         name: { type: String, required: true },
         type: {
             type: String,
-            enum: ['flash', 'weekly', 'sale', 'voucher'],
+            enum: ['flash', 'weekly', 'monthly', 'holiday', 'sale', 'voucher'],
             default: 'sale',
         },
         startDate: { type: Date, required: true },
