@@ -355,19 +355,22 @@
                     </div>
                     <div class='footer-table'>
                         <div class='mb-2 d-flex align-items-center justify-content-between'>
+                            <span><strong>Tổng tiền hóa đơn</strong></span>
+                            <span>{{formatPrice totalPrice}}</span>
+                        </div>
+                        <div class='mb-2 d-flex align-items-center justify-content-between'>
                             <span class='footer-label-table'>Thuế</span>
                             <span>1%</span>
                         </div>
                         <div class='mb-2 d-flex align-items-center justify-content-between'>
                             <span class='footer-label-table'>Giảm giá hóa đơn</span>
-                            {{#each orderItems}}
-                                <span>
-                                    {{formatPrice this.discountId.price}}
-                                </span>
-                            {{/each}}
+                            <span>
+                                {{discountPercent}}
+                                %
+                            </span>
                         </div>
                         <div class='mb-2 d-flex align-items-center justify-content-between'>
-                            <span><strong>Tổng tiền hóa đơn</strong></span>
+                            <span><strong>Tổng tiền thanh toán</strong></span>
                             <span>{{formatPrice order.totalAmount}}</span>
                         </div>
                     </div>
@@ -388,7 +391,7 @@
                     </div>
                     <div class='payment-details d-flex flex-column align-items-start justify-content-start'>
                         <span>Phương thức thanh toán:</span>
-                        <span><strong></strong></span>
+                        <span><strong>{{order.methodPayment}}</strong></span>
                     </div>
                     <div class='timeline-invoices'>
                         <span>Thời gian mua:</span>

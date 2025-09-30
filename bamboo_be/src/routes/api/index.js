@@ -26,6 +26,7 @@ router.get('/sizes', productsController.indexSize);
 
 // API Campaigns
 router.get('/campaigns/:campaignId/products', campaignsController.campaignWithProduct);
+router.get('/campaigns/active-products', campaignsController.activeCampaignProducts);
 
 // API Orders
 router.post('/payment/momo', ordersController.methodMomoPayment);

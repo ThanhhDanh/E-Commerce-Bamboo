@@ -3,6 +3,12 @@ const { mongodbToObject, mutipleMongooseToObject } = require('../../util/mongoos
 const CampaignProducts = require('../models/CampaignProducts');
 const Products = require('../models/Products');
 const Discounts = require('../models/Discounts');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 class CampaignController {
     //API Frontend
@@ -32,11 +38,15 @@ class CampaignController {
         try {
             const now = new Date();
 
+            console.log('now', now);
+
             // Lấy campaign đang diễn ra
             const campaigns = await Campaign.find({
                 startDate: { $lte: now },
                 endDate: { $gte: now },
             });
+
+            console.log('campaigns:', campaigns);
 
             if (!campaigns.length) {
                 return res.json([]);
@@ -123,7 +133,7 @@ class CampaignController {
             });
 
             res.render('campaigns/manage-products', {
-                campaign,
+                campaign: mongodbToObject(campaign),
                 products,
                 discounts,
             });

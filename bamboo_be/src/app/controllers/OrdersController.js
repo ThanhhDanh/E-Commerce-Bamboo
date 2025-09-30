@@ -86,7 +86,7 @@ class OrdersController {
                 vnp_TxnRef: txnRef,
                 vnp_OrderInfo: orderInfo || `Thanh toán đơn hàng #${order._id}`,
                 vnp_OrderType: 'other',
-                vnp_ReturnUrl: 'https://e-commerce-bamboo.onrender.com/api/payment/vnpay-return',
+                vnp_ReturnUrl: 'https://d3f698557309.ngrok-free.app/api/payment/vnpay-return',
                 vnp_Locale: 'vn',
                 vnp_CreateDate: dateFormat(new Date()),
                 vnp_ExpireDate: dateFormat(tomorrow),
@@ -121,6 +121,8 @@ class OrdersController {
             const txnRef = req.query.vnp_TxnRef;
             const orderId = txnRef.split('-')[0];
             const rspCode = req.query.vnp_ResponseCode;
+
+            console.log(txnRef, orderId, rspCode);
 
             if (rspCode === '00') {
                 await Orders.findByIdAndUpdate(orderId, { status: 'Paid' });
@@ -556,6 +558,12 @@ class OrdersController {
                 { path: 'discountId' },
             ]);
 
+            const discountPercent = orderItems[0]?.discountId?.price || 0;
+
+            const totalPrice = orderItems.reduce((sum, item) => {
+                return sum + item.productId.price * item.quantity;
+            }, 0);
+
             //Lấy tất cả hóa đơn của người dùng
             const userOrders = await Orders.find({ userId: order.userId }).sort({ createdAt: -1 }).populate('userId');
 
@@ -564,6 +572,8 @@ class OrdersController {
                 signature,
                 currentDate: moment(date).locale('vi').format('ll'),
                 orderItems: mutipleMongooseToObject(orderItems),
+                discountPercent,
+                totalPrice,
                 userOrders: mutipleMongooseToObject(userOrders),
             });
         } catch (error) {
