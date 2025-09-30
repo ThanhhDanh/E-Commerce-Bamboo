@@ -65,8 +65,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const newName = nameInput.value;
             const newType = typeSelect.value;
-            const newStart = dayjs.tz(dateInputs[0].value, 'DD Thg MM YYYY HH:mm', 'Asia/Ho_Chi_Minh').toDate();
-            const newEnd = dayjs.tz(dateInputs[2].value, 'DD Thg MM YYYY HH:mm', 'Asia/Ho_Chi_Minh').toDate();
+            const newStart = dayjs
+                .tz(dateInputs[0].value, 'DD Thg MM YYYY', 'Asia/Ho_Chi_Minh')
+                .startOf('day')
+                .toDate();
+            const newEnd = dayjs.tz(dateInputs[2].value, 'DD Thg MM YYYY', 'Asia/Ho_Chi_Minh').endOf('day').toDate();
 
             fetch(`/campaigns/${id}/edit`, {
                 method: 'PUT',

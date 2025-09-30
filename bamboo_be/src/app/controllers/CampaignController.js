@@ -4,11 +4,6 @@ const CampaignProducts = require('../models/CampaignProducts');
 const Products = require('../models/Products');
 const Discounts = require('../models/Discounts');
 const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 class CampaignController {
     //API Frontend
@@ -38,7 +33,7 @@ class CampaignController {
         try {
             const now = new Date();
 
-            console.log('now', now);
+            console.log('now: ', now);
 
             // Lấy campaign đang diễn ra
             const campaigns = await Campaign.find({
@@ -94,7 +89,12 @@ class CampaignController {
 
     //[PUT] /campaigns/:id/edit
     update(req, res, next) {
-        Campaign.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        const { startDate, endDate, ...rest } = req.body;
+
+        const newStart = dayjs(startDate).tz('Asia/Ho_Chi_Minh').startOf('day').toDate();
+        const newEnd = dayjs(endDate).tz('Asia/Ho_Chi_Minh').endOf('day').toDate();
+
+        Campaign.findByIdAndUpdate(req.params.id, { ...rest, startDate: newStart, endDate: newEnd }, { new: true })
             .then((updated) => res.json(updated))
             .catch(next);
     }
