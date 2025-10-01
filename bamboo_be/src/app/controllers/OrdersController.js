@@ -570,7 +570,7 @@ class OrdersController {
             res.render('orders/detail', {
                 order: mongodbToObject(order),
                 signature,
-                currentDate: moment(date).locale('vi').format('ll'),
+                currentDate: moment(date).locale('vi').format('L'),
                 orderItems: mutipleMongooseToObject(orderItems),
                 discountPercent,
                 totalPrice,
