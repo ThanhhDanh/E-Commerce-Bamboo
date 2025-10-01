@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
+    function formatDate(dateString) {
+        const d = new Date(dateString);
+        return new Intl.DateTimeFormat('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        }).format(d);
+    }
+
     const table = document.querySelector('tbody');
 
     table.addEventListener('click', function (e) {
@@ -17,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const currentName = nameCell.textContent.trim();
             const currentType = typeCell.textContent.trim();
-            const startDate = dayjs(row.dataset.start).format('YYYY-MM-DD');
-            const endDate = dayjs(row.dataset.end).format('YYYY-MM-DD');
+            const startDate = new Date(row.dataset.start).toISOString().split('T')[0];
+            const endDate = new Date(row.dataset.end).toISOString().split('T')[0];
 
             // Lưu giá trị gốc vào dataset để Cancel có thể khôi phục
             row.dataset.originalName = currentName;
@@ -65,11 +74,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const newName = nameInput.value;
             const newType = typeSelect.value;
-            const newStart = dayjs
-                .tz(dateInputs[0].value, 'DD Thg MM YYYY', 'Asia/Ho_Chi_Minh')
-                .startOf('day')
-                .toDate();
-            const newEnd = dayjs.tz(dateInputs[2].value, 'DD Thg MM YYYY', 'Asia/Ho_Chi_Minh').endOf('day').toDate();
+            const newStart = new Date(dateInputs[0].value).toISOString();
+            const newEnd = new Date(dateInputs[2].value).toISOString();
 
             fetch(`/campaigns/${id}/edit`, {
                 method: 'PUT',
@@ -86,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     row.querySelector('.cell-name').textContent = data.name;
                     row.querySelector('.cell-type').textContent = data.type;
                     row.querySelector('.cell-dates').textContent =
-                        `${dayjs(data.startDate).format('D [Thg] MM YYYY')} - ${dayjs(data.endDate).format('D [Thg] MM YYYY')}`;
+                        `${formatDate(data.startDate)} - ${formatDate(data.endDate)}`;
 
                     // update lại dataset
                     row.dataset.start = data.startDate;
@@ -121,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             nameCell.textContent = originalName;
             typeCell.textContent = originalType;
-            dateCell.textContent = `${dayjs(originalStart).format('D [Thg] MM YYYY')} - ${dayjs(originalEnd).format('D [Thg] MM YYYY')}`;
+            dateCell.textContent = `${formatDate(originalStart)} - ${formatDate(originalEnd)}`;
 
             actionsCell.innerHTML = `
                 <button class="btn btn-warning btn-sm btn-edit"><i class="fa fa-edit"></i></button>
@@ -143,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
         locale: 'vn',
         dateFormat: 'Y-m-d',
         altInput: true,
+        altFormat: 'd/m/Y',
         defaultDate: new Date(),
         allowInput: true,
     });

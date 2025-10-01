@@ -1,0 +1,16 @@
+# Ignore toàn bộ folder backup
+backup/
+
+# Ignore các file dump mongodump/mongorestore
+*.bson
+*.metadata.json
+*.json
+
+# Ignore các file môi trường
+.env
+*.env.local
+
+# Ignore các file hệ thống
+node_modules/
+dist/
+.vscode/

@@ -80,11 +80,11 @@
                     <tr data-id='{{this._id}}' data-start='{{this.startDate}}' data-end='{{this.endDate}}'>
                         <td class='cell-id'>{{this._id}}</td>
                         <td class='cell-name'>{{this.name}}</td>
-                        <td class='cell-dates'>{{formatDate this.startDate 'll'}}
+                        <td class='cell-dates'>{{formatDate this.startDate 'L'}}
                             -
-                            {{formatDate this.endDate 'll'}}</td>
+                            {{formatDate this.endDate 'L'}}</td>
                         <td class='cell-type'>{{this.type}}</td>
-                        <td class='cell-created'>{{formatDate this.createdAt 'll'}}</td>
+                        <td class='cell-created'>{{formatDate this.createdAt 'L'}}</td>
                         <td class='cell-actions'>
                             <button class='btn btn-warning btn-sm btn-edit'>
                                 <i class='fa fa-edit'></i>

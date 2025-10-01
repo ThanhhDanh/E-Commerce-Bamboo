@@ -3,7 +3,6 @@ const { mongodbToObject, mutipleMongooseToObject } = require('../../util/mongoos
 const CampaignProducts = require('../models/CampaignProducts');
 const Products = require('../models/Products');
 const Discounts = require('../models/Discounts');
-const dayjs = require('dayjs');
 
 class CampaignController {
     //API Frontend
@@ -89,12 +88,7 @@ class CampaignController {
 
     //[PUT] /campaigns/:id/edit
     update(req, res, next) {
-        const { startDate, endDate, ...rest } = req.body;
-
-        const newStart = dayjs(startDate).tz('Asia/Ho_Chi_Minh').startOf('day').toDate();
-        const newEnd = dayjs(endDate).tz('Asia/Ho_Chi_Minh').endOf('day').toDate();
-
-        Campaign.findByIdAndUpdate(req.params.id, { ...rest, startDate: newStart, endDate: newEnd }, { new: true })
+        Campaign.findByIdAndUpdate(req.params.id, req.body, { new: true })
             .then((updated) => res.json(updated))
             .catch(next);
     }
