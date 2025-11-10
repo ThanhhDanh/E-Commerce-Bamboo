@@ -117,6 +117,8 @@ class CampaignController {
                 };
             });
 
+            console.log(productMap);
+
             //Gắn vào products
             products.forEach((p) => {
                 if (productMap[p._id]) {
@@ -125,6 +127,8 @@ class CampaignController {
                     p.checked = true;
                 }
             });
+
+            console.log(products);
 
             res.render('campaigns/manage-products', {
                 campaign: mongodbToObject(campaign),

@@ -46,7 +46,7 @@
                                 <option value="">-- Chọn Discount --</option>
                                 {{#each ../discounts}}
                                     <option value="{{this._id}}" data-percent="{{this.price}}"
-                                        {{#if (eq this._id ../selectedDiscountId)}}selected{{/if}}>
+                                        {{#if (eq this._id ../../selectedDiscountId)}}selected{{/if}}>
                                         {{this.name}} - {{this.price}}%
                                     </option>
                                 {{/each}}
