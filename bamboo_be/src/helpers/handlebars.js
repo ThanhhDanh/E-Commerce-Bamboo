@@ -1,4 +1,5 @@
 const Handlebars = require('handlebars');
+const CampaignProducts = require('../app/models/CampaignProducts');
 
 module.exports = {
     sum: (a, b) => a + b,
@@ -66,5 +67,21 @@ module.exports = {
               : statusMap[text] === 2
                 ? 'Hủy thanh toán'
                 : '';
+    },
+    mergeCampaignPrice: async function (products) {
+        const productIds = products.map((p) => p._id);
+
+        const campaigns = await CampaignProducts.find({
+            productId: { $in: productIds },
+        });
+
+        return products.map((p) => {
+            const campaign = campaigns.find((c) => String(c.productId) === String(p._id));
+
+            return {
+                ...p.toObject(),
+                salePrice: campaign ? campaign.salePrice : 0,
+            };
+        });
     },
 };

@@ -3,44 +3,93 @@ const Shop = require('../models/Shops');
 const { mutipleMongooseToObject } = require('../../util/mongoose');
 const Campaigns = require('../models/Campaigns');
 const CampaignProducts = require('../models/CampaignProducts');
+const Products = require('../models/Products');
+const OrderDetails = require('../models/OrderDetails');
+const { mergeCampaignPrice } = require('../../helpers/handlebars');
 
 class MeController {
     //API Frontend
-    // [GET] /products
-    index(req, res, next) {
-        Product.find({})
-            .sortable(req)
-            .then((products) => {
-                res.json(products);
-            })
-            .catch(next);
+    // [GET] /products - danh sách sản phẩm cho người dùng mua
+    async index(req, res, next) {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 20;
+            const skip = (page - 1) * limit;
+
+            const sortQuery = {};
+            if (req.query.sort) {
+                req.query.sort.split(',').forEach((field) => {
+                    const direction = field.startsWith('-') ? -1 : 1;
+                    sortQuery[field.replace('-', '')] = direction;
+                });
+            }
+
+            const filter = {};
+            if (req.query.category) filter.category = req.query.category;
+            if (req.query.brand) filter.brand = req.query.brand;
+
+            const products = await Product.find(filter).sort(sortQuery).skip(skip).limit(limit);
+
+            const productsWithSale = await mergeCampaignPrice(products);
+
+            const total = await Product.countDocuments(filter);
+
+            res.json({
+                data: productsWithSale,
+                pagination: {
+                    currentPage: page,
+                    totalItems: total,
+                    totalPages: Math.ceil(total / limit),
+                },
+            });
+        } catch (err) {
+            next(err);
+        }
     }
 
     //[GET] /products/newest - Sản phẩm mới nhất
-    newestProducts(req, res, next) {
-        Product.find({})
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .then((newest) => {
-                res.json(newest);
+    async newestProducts(req, res, next) {
+        try {
+            const newest = await Products.find({
+                $or: [{ isFeatured: false }, { releaseDate: { $lt: new Date() } }],
             })
-            .catch(next);
+                .sort({ createdAt: -1 })
+                .limit(12);
+
+            //Không có newest thì fallback qua best-selling
+            if (!newest.length) {
+                return this.bestSellingProducts(req, res, next);
+            }
+
+            const merged = await mergeCampaignPrice(newest);
+
+            res.json(merged);
+        } catch (err) {
+            next(err);
+        }
     }
 
     //[GET] /products/upcoming - Sản phẩm ra mắt
-    upcomingProducts(req, res, next) {
-        Product.find({
-            $and: [
-                { isFeatured: true },
-                { releaseDate: { $gte: new Date() } }, // Chưa đến ngày ra mắt
-            ],
-        })
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .then((upcoming) => {
-                res.json(upcoming);
+    async upcomingProducts(req, res, next) {
+        try {
+            const upcoming = await Product.find({
+                isFeatured: true,
+                releaseDate: { $gte: new Date() }, // Chưa đến ngày ra mắt
             })
-            .catch(next);
+                .sort({ createdAt: -1 })
+                .limit(12);
+
+            //Nếu không có upcoming thì fallback sang best-selling
+            if (!upcoming.length) {
+                return this.bestSellingProducts(req, res, next);
+            }
+
+            const merged = await mergeCampaignPrice(upcoming);
+
+            res.json(merged);
+        } catch (err) {
+            next(err);
+        }
     }
 
     //[GET] /products/appear/sale - Sản phẩm ra mắt và đang giảm giá
@@ -65,7 +114,7 @@ class MeController {
                 type: 'weekly',
                 startDate: { $lte: now },
                 endDate: { $gte: now },
-            });
+            }).limit(9);
 
             if (!campaign) return res.json([]);
 
@@ -73,11 +122,39 @@ class MeController {
 
             const products = campaignProducts.map((cp) => {
                 const product = cp.productId.toObject();
-                product.finalPrice = cp.salePrice ?? product.price;
+                product.salePrice = cp.salePrice ?? product.price;
                 return product;
             });
 
             res.json(products);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    //[GET] /products/best-selling
+    async bestSellingProducts(req, res, next) {
+        try {
+            const bestSelling = await OrderDetails.aggregate([
+                { $group: { _id: '$productId', quantity: { $sum: '$quantity' } } },
+                { $sort: { quantity: -1 } },
+                { $limit: 12 },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'product',
+                    },
+                },
+                { $unwind: '$product' },
+            ]);
+
+            const products = bestSelling.map((item) => item.product);
+
+            const productsWithSale = await mergeCampaignPrice(products);
+
+            res.json(productsWithSale);
         } catch (err) {
             next(err);
         }

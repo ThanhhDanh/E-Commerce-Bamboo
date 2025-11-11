@@ -18,6 +18,7 @@ router.post('/categories', categoriesController.storeAPI);
 router.get('/products', meController.index);
 router.get('/products/newest', meController.newestProducts);
 router.get('/products/upcoming', meController.upcomingProducts);
+router.get('/products/best-selling', meController.bestSellingProducts);
 // router.get('/products/appear/sale', meController.appearSaleProducts);
 router.get('/products/weekly-deals', meController.weeklyDealProducts);
 router.get('/colors', productsController.indexColor);
