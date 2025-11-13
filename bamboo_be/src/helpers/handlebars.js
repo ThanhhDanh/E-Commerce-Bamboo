@@ -70,17 +70,27 @@ module.exports = {
     },
     mergeCampaignPrice: async function (products) {
         const productIds = products.map((p) => p._id);
+        const now = new Date();
 
         const campaigns = await CampaignProducts.find({
             productId: { $in: productIds },
+        }).populate({
+            path: 'campaignId',
+            match: {
+                startDate: { $lte: now },
+                endDate: { $gte: now },
+            },
         });
 
         return products.map((p) => {
-            const campaign = campaigns.find((c) => String(c.productId) === String(p._id));
+            const activeCampaigns = campaigns.filter((c) => String(c.productId) === String(p._id) && c.campaignId);
+
+            const salePrice = activeCampaigns.length > 0 ? Math.min(...activeCampaigns.map((c) => c.salePrice)) : 0;
 
             return {
                 ...p.toObject(),
-                salePrice: campaign ? campaign.salePrice : 0,
+                salePrice,
+                activeCampaigns,
             };
         });
     },

@@ -8,9 +8,39 @@ const fs = require('fs');
 const Sizes = require('../models/Sizes');
 const Colors = require('../models/Colors');
 const Discounts = require('../models/Discounts');
-const discountCache = require('../../util/discountCache');
+const CampaignProducts = require('../models/CampaignProducts');
 
 class ProductController {
+    //API - Frontend
+    //[GET] /product/:slug/detail
+    detailProduct(req, res, next) {
+        Product.findOne({ slug: req.params.slug })
+            .then(async (product) => {
+                const now = new Date();
+                const campaigns = await CampaignProducts.find({
+                    productId: { $in: product._id },
+                }).populate({
+                    path: 'campaignId',
+                    match: {
+                        startDate: { $lte: now },
+                        endDate: { $gte: now },
+                    },
+                });
+                const activeCampaigns = campaigns.filter((c) => c.campaignId);
+                let salePrice = product.price;
+                if (activeCampaigns.length > 0) {
+                    salePrice = Math.min(...activeCampaigns.map((c) => c.salePrice));
+                }
+
+                res.json({
+                    ...product.toObject(),
+                    salePrice,
+                    activeCampaigns,
+                });
+            })
+            .catch(next);
+    }
+
     //[GET] /colors
     indexColor(req, res, next) {
         Colors.find({})

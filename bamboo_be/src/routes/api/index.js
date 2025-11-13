@@ -7,6 +7,7 @@ const campaignsController = require('../../app/controllers/CampaignController');
 const apiAuthController = require('../../app/controllers/ApiAuthController');
 const authenticateToken = require('../../app/middlewares/authenticateToken');
 const ordersController = require('../../app/controllers/OrdersController');
+const cartsController = require('../../app/controllers/CartController');
 
 // API routes
 
@@ -16,6 +17,7 @@ router.post('/categories', categoriesController.storeAPI);
 
 // API Products
 router.get('/products', meController.index);
+router.get('/product/:slug/detail', productsController.detailProduct);
 router.get('/products/newest', meController.newestProducts);
 router.get('/products/upcoming', meController.upcomingProducts);
 router.get('/products/best-selling', meController.bestSellingProducts);
@@ -35,6 +37,13 @@ router.post('/payment/momo-ipn', ordersController.momoIpn);
 router.put('/payment/momo/:id/cancel', ordersController.cancelMomoPayment);
 router.post('/payment/vnpay', ordersController.methodVnpayPayment);
 router.get('/payment/vnpay-return', ordersController.checkPaymentVNPay);
+
+//API Carts
+router.get('/cart/:userId', cartsController.getCart);
+router.post('/cart/store', cartsController.addToCart);
+router.put('/cart/update', cartsController.updateItemCart);
+router.delete('/cart/delete', cartsController.removeItemCart);
+router.delete('/cart/delete/force', cartsController.clearCart);
 
 // API Auth
 router.post('/login', apiAuthController.login);
