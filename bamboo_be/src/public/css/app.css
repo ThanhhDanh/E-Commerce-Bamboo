@@ -130,6 +130,10 @@ html *::-webkit-scrollbar-track {
   font-size: 1.6rem;
   color: #fff;
 }
+.nav-item .preview-list {
+  min-width: 285px;
+  width: 100%;
+}
 
 .header-icon-img {
   width: 30px;

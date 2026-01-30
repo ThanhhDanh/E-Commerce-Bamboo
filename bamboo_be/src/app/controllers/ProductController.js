@@ -161,7 +161,9 @@ class ProductController {
                 updateFields.image = `/uploads/${req.file.filename}`;
             }
 
-            updateFields.isFeatured = updateFields.isFeatured === 'true';
+            updateFields.isFeatured = req.body.isFeatured === 'true';
+
+            console.log('updateFields: ', updateFields);
 
             // Cập nhật dữ liệu sản phẩm trong MongoDB
             Product.updateOne({ _id: req.params.id }, updateFields)

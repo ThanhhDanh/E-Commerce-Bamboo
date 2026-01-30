@@ -131,11 +131,6 @@ html *::-webkit-scrollbar-track {
     padding-left: 12px;
     transition: all 0.3s ease-in-out;
 
-    // &:hover {
-    //     background: #3a4857;
-    //     border-radius: 20px;
-    // }
-
     i {
         width: 30px;
         text-align: center;
@@ -145,6 +140,11 @@ html *::-webkit-scrollbar-track {
     .nav-link {
         font-size: 1.6rem;
         color: variables.$white-color;
+    }
+
+    .preview-list {
+        min-width: 285px;
+        width: 100%;
     }
 }
 
