@@ -1,5 +1,10 @@
 {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "git.ignoreLimitWarning": true
+    "[handlebars]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "files.associations": {
+        "*.hbs": "handlebars"
+    }
 }

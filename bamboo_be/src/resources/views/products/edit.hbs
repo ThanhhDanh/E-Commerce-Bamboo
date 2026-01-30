@@ -91,6 +91,26 @@
                 </select>
                 {{{validateInput errors "colorId"}}}
             </div>
+            <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
+                        <label for="isFeatured" class="form-label mb-4">Sản phẩm ra mắt</label>
+                        <div class="checkbox-wrapper-46">
+                        <input type="checkbox" id="cbx-46" name="isFeatured" value="true" class="inp-cbx" {{#if product.isFeatured}}checked{{/if}}/>
+                        <label for="cbx-46" class="cbx"
+                            ><span>
+                            <svg viewBox="0 0 12 10" height="10px" width="12px">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
+                            ><span>Sản phẩm nổi bật</span>
+                        </label>
+                        </div>
+                        {{{validateInput errors "isFeatured"}}}
+                    </div>
+               <div class="mb-3">
+                    <label for="releaseDate" class="form-label">Ngày ra mắt</label>
+                    <input type="text" class="form-control flatpickr" id="releaseDate" value="{{formatDate product.releaseDate ''}}" name="releaseDate" placeholder="Ngày ra mắt sản phẩm..." >
+                    {{{validateInput errors "releaseDate"}}}
+                </div>
+            </div>
             <button type='submit' class='btn btn-primary'>Lưu sản phẩm</button>
         </form>
     </div>
@@ -103,6 +123,14 @@
                 placeholder: '-- Chọn --', 
                 allowClear: true,
             });
+        });
+
+        $('.flatpickr').flatpickr({
+            locale: "vn",
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "d/m/Y",
+            allowInput: true,
         });
     })
 </script>

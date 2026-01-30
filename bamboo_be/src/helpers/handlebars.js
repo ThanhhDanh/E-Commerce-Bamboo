@@ -88,7 +88,7 @@ module.exports = {
             const salePrice = activeCampaigns.length > 0 ? Math.min(...activeCampaigns.map((c) => c.salePrice)) : 0;
 
             return {
-                ...p.toObject(),
+                ...p,
                 salePrice,
                 activeCampaigns,
             };
