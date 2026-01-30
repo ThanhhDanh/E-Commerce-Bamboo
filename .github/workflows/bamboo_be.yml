@@ -1,0 +1,32 @@
+name: Deploy Backend to Render
+
+on:
+  push:
+    branches:
+      - main    # chỉ chạy khi merge/push vào main
+    paths:
+      - "bamboo_be/**"   # chỉ chạy nếu thay đổi trong thư mục backend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: ./bamboo_be
+        run: npm ci
+
+      - name: Run tests (optional)
+        working-directory: ./bamboo_be
+        run: npm test
+
+      - name: Push to main branch (trigger Render auto deploy)
+        run: echo "Render auto-deploy will trigger on push to main"
