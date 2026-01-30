@@ -7,6 +7,7 @@ const useTls = redisUrl.startsWith('rediss://');
 const connection = new IORedis(process.env.REDIS_URL, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
+    retryStrategy: (times) => Math.min(times * 50, 2000), // retry sau 50ms, max 2s
     ...(useTls && { tls: { rejectUnauthorized: false } }),
 });
 

@@ -126,7 +126,7 @@ class ChatController {
             );
 
             // Lưu vào Redis
-            await redisClient.set(`conversations:${staffId}`, JSON.stringify(result));
+            await redisClient.set(`conversations:${staffId}`, JSON.stringify(result), 'EX', 3600); //expire sau 1 giờ
 
             res.json(result);
         } catch (err) {
@@ -185,13 +185,17 @@ class ChatController {
                 };
             });
             // Lưu vào Redis
-            await redisClient.set(`chat:${currentUserId}:${otherUserId}`, JSON.stringify(formatted));
+            await redisClient.set(`chat:${currentUserId}:${otherUserId}`, JSON.stringify(formatted), 'EX', 1800); //expire sau 30 phút
 
-            // Lấy lại từ Redis
-            const cached = await redisClient.get(`chat:${currentUserId}:${otherUserId}`);
+            try {
+                // Lấy lại từ Redis
+                const cached = await redisClient.get(`chat:${currentUserId}:${otherUserId}`);
 
-            if (cached) {
-                res.json({ user: otherUser, messages: JSON.parse(cached) });
+                if (cached) {
+                    res.json({ user: otherUser, messages: JSON.parse(cached) });
+                }
+            } catch (error) {
+                console.warn('Rdis cache miss/fail: ', error);
             }
         } catch (err) {
             console.error('Lỗi khi lấy messages với user:', err);
