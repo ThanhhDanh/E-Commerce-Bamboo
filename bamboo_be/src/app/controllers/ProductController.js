@@ -151,21 +151,19 @@ class ProductController {
         try {
             // Lọc dữ liệu từ req.body
             const updateFields = {
-                ...req.body, // Các trường khác từ form
+                ...req.body,
                 sizeIds: req.body.sizeIds || [],
                 colorIds: req.body.colorIds || [],
+                isFeatured: Array.isArray(req.body.isFeatured)
+                    ? req.body.isFeatured.includes('true')
+                    : req.body.isFeatured === 'true' || req.body.isFeatured === true,
             };
 
             // Nếu có file upload, thêm thông tin đường dẫn file vào updateFields
             if (req.file) {
-                updateFields.image = `/uploads/${req.file.filename}`;
+                updateFields.image = req.file.path;
             }
 
-            updateFields.isFeatured = req.body.isFeatured === 'true';
-
-            console.log('updateFields: ', updateFields);
-
-            // Cập nhật dữ liệu sản phẩm trong MongoDB
             Product.updateOne({ _id: req.params.id }, updateFields)
                 .then(() => res.redirect('/me/stored/products'))
                 .catch(next);
