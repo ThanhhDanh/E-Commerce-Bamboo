@@ -94,4 +94,9 @@ module.exports = {
             };
         });
     },
+    groundTypes: () => ['FG', 'AG', 'TF', 'IC', 'SG', 'Indoor'],
+    formatGroundType: (type) => {
+        const map = { FG: 'Firm Ground', AG: 'Artificial Grass' /*...*/ };
+        return map[type] || type;
+    },
 };

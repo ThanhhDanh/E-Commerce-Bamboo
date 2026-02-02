@@ -37,7 +37,7 @@ const fetchColors = async () => {
 router.get('/create', productsController.create);
 router.post(
     '/store',
-    upload.single('image'),
+    upload.any(),
     [
         body('name').notEmpty().withMessage('Tên sản phẩm không được để trống'),
         body('description').notEmpty().withMessage('Thông tin sản phẩm không được để trống'),
@@ -51,7 +51,7 @@ router.post(
     productsController.store,
 );
 router.post('/handle-form-actions', productsController.handleFormActions);
-router.put('/:id', upload.single('image'), productsController.update);
+router.put('/:id', upload.any(), productsController.update);
 router.delete('/:id', productsController.delete);
 router.delete('/:id/force', productsController.deleteForce);
 router.patch('/:id/restore', productsController.restore);

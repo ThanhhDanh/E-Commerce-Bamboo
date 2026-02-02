@@ -20,14 +20,8 @@
         <form class='mt-4' method='POST' action='/products/{{product._id}}?_method=PUT' enctype='multipart/form-data'>
             <div class='mb-3'>
                 <label for='name' class='form-label'>Tên sản phẩm</label>
-                <input
-                    type='text'
-                    value='{{product.name}}'
-                    class='form-control'
-                    id='name'
-                    name='name'
-                    placeholder='Name...'
-                />
+                <input type='text' value='{{product.name}}' class='form-control' id='name' name='name'
+                    placeholder='Name...' />
             </div>
             <div class='mb-3'>
                 <label for='image' class='form-label'>Ảnh sản phẩm</label>
@@ -38,77 +32,89 @@
             </div>
             <div class='mb-3'>
                 <label for='description' class='form-label'>Mô tả sản phẩm</label>
-                <textarea
-                    class='form-control'
-                    rows='20'
-                    id='description'
-                    name='description'
-                >{{product.description}}</textarea>
+                <textarea class='form-control' rows='20' id='description'
+                    name='description'>{{product.description}}</textarea>
             </div>
             <div class='mb-3'>
                 <label for='price' class='form-label'>Giá sản phẩm</label>
-                <input
-                    type='text'
-                    value='{{product.price}}'
-                    class='form-control'
-                    id='price'
-                    name='price'
-                    placeholder='Price...'
-                />
+                <input type='text' value='{{product.price}}' class='form-control' id='price' name='price'
+                    placeholder='Price...' />
             </div>
             <div class='mb-3'>
                 <label for='gender' class='form-label'>Giới tính sản phẩm</label>
-                <input
-                    type='text'
-                    value='{{product.genderId}}'
-                    class='form-control'
-                    id='gender'
-                    name='gender'
-                    placeholder='Gender...'
-                />
+                <input type='text' value='{{product.genderId}}' class='form-control' id='gender' name='gender'
+                    placeholder='Gender...' />
             </div>
             <div class="mb-3">
                 <label for="sizeId" class="form-label">Kích thước sản phẩm</label>
                 <select class="form-control select2" id="sizeId" name="sizeIds[]" multiple>
                     <option value="">-- Chọn kích thước sản phẩm --</option>
-                     {{#each sizes}}
-                        <option value="{{this._id}}" {{arrayContains ../product.sizeIds this._id}}>
-                            {{this.name}}
-                        </option>
+                    {{#each sizes}}
+                    <option value="{{this._id}}" {{arrayContains ../product.sizeIds this._id}}>
+                        {{this.name}}
+                    </option>
                     {{/each}}
                 </select>
                 {{{validateInput errors "sizeId"}}}
             </div>
-            <div class="mb-3">
-                <label for="colorId" class="form-label">Màu sản phẩm</label>
-                <select class="form-control select2" id="colorId" name="colorIds[]" multiple>
-                    <option value="">-- Chọn màu sản phẩm --</option>
-                    {{#each colors}}
-                        <option value="{{this._id}}" {{arrayContains ../product.colorIds this._id}}>
-                            {{this.name}}
-                        </option>
-                    {{/each}}
-                </select>
-                {{{validateInput errors "colorId"}}}
+            <div class="row">
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                        <label for="colorId" class="form-label">Màu sản phẩm</label>
+                        <select class="form-control select2" id="colorId" name="colorIds[]" multiple>
+                            <option value="">-- Chọn màu sản phẩm --</option>
+                            {{#each colors}}
+                            <option value="{{this._id}}" 
+                            {{#each ../product.colorVariants}} 
+                            {{#if (eq this.colorId ../this._id)}}selected{{/if}} 
+                            {{/each}}>
+                                {{this.name}}
+                            </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "colorId"}}}
+                        <div id="color-images"></div>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-12 col-md-3 col-lg-3">
+            <div class="row">
+                <div class="col-sm-12 col-md-3 col-lg-3">
                     <div class="mb-3">
                         <label for="isFeatured" class="form-label mb-4">Sản phẩm ra mắt</label>
                         <div class="checkbox-wrapper-46">
-                        <input type="checkbox" id="cbx-46" name="isFeatured" value="true" class="inp-cbx" {{#if product.isFeatured}}checked{{/if}}/>
-                        <label for="cbx-46" class="cbx"
-                            ><span>
-                            <svg viewBox="0 0 12 10" height="10px" width="12px">
-                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
-                            ><span>Sản phẩm nổi bật</span>
-                        </label>
+                            <input type="checkbox" id="cbx-46" name="isFeatured" value="true" class="inp-cbx" {{#if
+                                product.isFeatured}}checked{{/if}} />
+                            <label for="cbx-46" class="cbx"><span>
+                                    <svg viewBox="0 0 12 10" height="10px" width="12px">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg></span><span>Sản phẩm nổi bật</span>
+                            </label>
                         </div>
                         {{{validateInput errors "isFeatured"}}}
                     </div>
-               <div class="mb-3">
-                    <label for="releaseDate" class="form-label">Ngày ra mắt</label>
-                    <input type="text" class="form-control flatpickr" id="releaseDate" value="{{formatDate product.releaseDate ''}}" name="releaseDate" placeholder="Ngày ra mắt sản phẩm..." >
-                    {{{validateInput errors "releaseDate"}}}
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                        <label for="releaseDate" class="form-label">Ngày ra mắt</label>
+                        <input type="text" class="form-control flatpickr" id="releaseDate"
+                            value="{{formatDate product.releaseDate ''}}" name="releaseDate"
+                            placeholder="Ngày ra mắt sản phẩm...">
+                        {{{validateInput errors "releaseDate"}}}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="">
+                        <label for="groundType" class="form-label">Loại giày tự nhiên / nhân tạo</label>
+                        <select class="form-control" id="groundType" name="groundType">
+                            <option value="">-- Chọn giày tự nhiên / nhân tạo --</option>
+                            {{#each (groundTypes)}}
+                            <option value="{{this}}" {{#if (eq ../product.groundType this)}}selected{{/if}}>
+                                {{formatGroundType this}}
+                            </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "groundType"}}}
+                    </div>
                 </div>
             </div>
             <button type='submit' class='btn btn-primary'>Lưu sản phẩm</button>
@@ -117,12 +123,70 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        $(document).ready(function () {
             $('.select2').select2({
-                placeholder: '-- Chọn --', 
+                placeholder: '-- Chọn --',
                 allowClear: true,
             });
+
+            const colorSelect = document.getElementById('colorId');
+            const imagesContainer = document.getElementById('color-images');
+
+            if (!colorSelect || !imagesContainer) {
+                console.error('Không tìm thấy #colorId hoặc #color-images');
+                return;
+            }
+
+            const oldColorVariants = {{{json product.colorVariants}}} || [];
+
+            function renderColorImageInputs() {
+
+                imagesContainer.innerHTML = '';
+
+                const selectedData = $(colorSelect).select2('data') || [];
+
+                if (selectedData.length === 0) {
+                    imagesContainer.innerHTML = '<p class="text-gray-500 italic">Chưa chọn màu nào</p>';
+                    return;
+                }
+
+                selectedData.forEach(item => {
+                    const colorId = item.id;
+                    const colorName = item.text.trim();
+
+                    const oldVariant = oldColorVariants.find(v => v.colorId.toString() === colorId.toString());
+                    const oldImage = oldVariant ? oldVariant.image : null;
+
+                    const div = document.createElement('div');
+                    div.className = '';
+                    div.innerHTML = `
+                        <label class="form-label">
+                            Ảnh riêng cho màu: <strong>${colorName}</strong> 
+                        </label>
+                        ${oldImage ? `
+                        <div class="mb-2">
+                        <p class="text-xs text-gray-600">Ảnh hiện tại:</p>
+                        <img src="${oldImage}" alt="${colorName}" class="w-25 h-auto object-cover rounded border">
+                        </div>
+                    ` : ''}
+                        <input 
+                            type="file" 
+                            name="colorImage_${colorId}" 
+                            accept="image/*" 
+                            class="form-control"
+                        />
+                        <p class="text-xs text-gray-500 mt-1">Ảnh đại diện riêng cho màu này trên sản phẩm (không bắt buộc)</p>
+                    `;
+                    imagesContainer.appendChild(div);
+                });
+            }
+
+            $(colorSelect).on('change', function () {
+                renderColorImageInputs();
+            });
+
+            renderColorImageInputs();
         });
 
         $('.flatpickr').flatpickr({

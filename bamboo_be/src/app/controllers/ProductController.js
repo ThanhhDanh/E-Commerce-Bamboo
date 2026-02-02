@@ -4,41 +4,33 @@ const User = require('../models/Users');
 const Category = require('../models/Categories');
 const Shop = require('../models/Shops');
 const { mongodbToObject, mutipleMongooseToObject } = require('../../util/mongoose');
-const fs = require('fs');
 const Sizes = require('../models/Sizes');
 const Colors = require('../models/Colors');
 const Discounts = require('../models/Discounts');
 const CampaignProducts = require('../models/CampaignProducts');
+const { mergeCampaignPrice } = require('../../helpers/handlebars');
 
 class ProductController {
     //API - Frontend
     //[GET] /product/:slug/detail
-    detailProduct(req, res, next) {
-        Product.findOne({ slug: req.params.slug })
-            .then(async (product) => {
-                const now = new Date();
-                const campaigns = await CampaignProducts.find({
-                    productId: { $in: product._id },
-                }).populate({
-                    path: 'campaignId',
-                    match: {
-                        startDate: { $lte: now },
-                        endDate: { $gte: now },
-                    },
-                });
-                const activeCampaigns = campaigns.filter((c) => c.campaignId);
-                let salePrice = product.price;
-                if (activeCampaigns.length > 0) {
-                    salePrice = Math.min(...activeCampaigns.map((c) => c.salePrice));
-                }
+    async detailProduct(req, res, next) {
+        try {
+            const product = await Product.findOne({ slug: req.params.slug })
+                .populate('categoryId', 'name slug')
+                .populate('colorIds', 'name code image')
+                .populate('sizeIds', 'name')
+                .lean();
 
-                res.json({
-                    ...product.toObject(),
-                    salePrice,
-                    activeCampaigns,
-                });
-            })
-            .catch(next);
+            if (!product) {
+                return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
+            }
+
+            const [merged] = await mergeCampaignPrice([product]);
+
+            res.json(merged);
+        } catch (err) {
+            next(err);
+        }
     }
 
     //[GET] /colors
@@ -109,10 +101,12 @@ class ProductController {
 
     // [POST] /products/store
     async store(req, res, next) {
+        console.log('req.body:', req.body);
+        console.log('req.files:', req.files);
         try {
+            let image = null;
             if (req.file) {
-                const imageUrl = req.file.path;
-                req.body.image = imageUrl;
+                image = req.file.path;
             } else {
                 return res.status(400).json({ message: 'Ảnh sản phẩm không được để trống' });
             }
@@ -120,10 +114,26 @@ class ProductController {
                 ? req.body.isFeatured.includes('true')
                 : req.body.isFeatured === 'true';
 
+            const colorVariants = [];
+            const colorIds = req.body.colorIds || [];
+
+            if (Array.isArray(colorIds) && colorIds.length > 0) {
+                for (const colorId of colorIds) {
+                    const fileKey = `colorImage_${colorId}`;
+                    const colorImageFile = req.files?.[fileKey]?.[0];
+
+                    colorVariants.push({
+                        colorId: colorId,
+                        image: colorImageFile ? colorImageFile.path : null,
+                    });
+                }
+            }
+
             const product = new Product({
                 ...req.body,
+                image,
                 sizeIds: req.body.sizeId || [],
-                colorIds: req.body.colorId || [],
+                colorVariants,
             });
 
             await product.save();
@@ -141,34 +151,56 @@ class ProductController {
                     product: mongodbToObject(product),
                     sizes: mutipleMongooseToObject(sizes),
                     colors: mutipleMongooseToObject(colors),
+                    colorVariants: product.colorVariants,
                 });
             })
             .catch(next);
     }
 
     //[PUT] /products/:id
-    update(req, res, next) {
+    async update(req, res, next) {
         try {
-            // Lọc dữ liệu từ req.body
-            const updateFields = {
-                ...req.body, // Các trường khác từ form
-                sizeIds: req.body.sizeIds || [],
-                colorIds: req.body.colorIds || [],
-            };
-
-            // Nếu có file upload, thêm thông tin đường dẫn file vào updateFields
-            if (req.file) {
-                updateFields.image = `/uploads/${req.file.filename}`;
+            const oldProduct = await Product.findById(req.params.id).lean();
+            if (!oldProduct) {
+                return res.status(404).json({ message: 'Sản phẩm không tồn tại' });
             }
 
-            updateFields.isFeatured = req.body.isFeatured === 'true';
+            const updateFields = {
+                ...req.body,
+                sizeIds: req.body.sizeIds || [],
+                isFeatured: Array.isArray(req.body.isFeatured)
+                    ? req.body.isFeatured.includes('true')
+                    : req.body.isFeatured === 'true' || req.body.isFeatured === true,
+            };
 
-            console.log('updateFields: ', updateFields);
+            if (req.file) {
+                updateFields.image = req.file.path;
+            }
 
-            // Cập nhật dữ liệu sản phẩm trong MongoDB
-            Product.updateOne({ _id: req.params.id }, updateFields)
-                .then(() => res.redirect('/me/stored/products'))
-                .catch(next);
+            const colorVariants = [];
+            const colorIds = req.body.colorIds || [];
+
+            if (Array.isArray(colorIds) && colorIds.length > 0) {
+                for (const colorId of colorIds) {
+                    const fileKey = `colorImage_${colorId}`;
+                    const colorImageFile = req.files?.find((file) => file.fieldname === fileKey);
+
+                    const oldVariant = oldProduct.colorVariants?.find(
+                        (v) => v.colorId.toString() === colorId.toString(),
+                    );
+
+                    colorVariants.push({
+                        colorId,
+                        image: colorImageFile ? colorImageFile.path : oldVariant?.image || null,
+                    });
+                }
+            }
+
+            updateFields.colorVariants = colorVariants;
+
+            await Product.updateOne({ _id: req.params.id }, updateFields);
+
+            res.redirect('/me/stored/products');
         } catch (err) {
             next(err);
         }
