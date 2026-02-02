@@ -1,9 +1,8 @@
-const Product = require('../models/Products');
-const Shop = require('../models/Shops');
+const Products = require('../models/Products');
+const Shops = require('../models/Shops');
 const { mutipleMongooseToObject } = require('../../util/mongoose');
 const Campaigns = require('../models/Campaigns');
 const CampaignProducts = require('../models/CampaignProducts');
-const Products = require('../models/Products');
 const OrderDetails = require('../models/OrderDetails');
 const { mergeCampaignPrice } = require('../../helpers/handlebars');
 
@@ -25,14 +24,13 @@ class MeController {
             }
 
             const filter = {};
-            if (req.query.category) filter.category = req.query.category;
-            if (req.query.brand) filter.brand = req.query.brand;
+            if (req.query.category) filter.categoryId = req.query.category;
 
-            const products = await Product.find(filter).sort(sortQuery).skip(skip).limit(limit);
+            const products = await Products.find(filter).sort(sortQuery).skip(skip).limit(limit);
 
             const productsWithSale = await mergeCampaignPrice(products);
 
-            const total = await Product.countDocuments(filter);
+            const total = await Products.countDocuments(filter);
 
             res.json({
                 data: productsWithSale,
@@ -53,6 +51,7 @@ class MeController {
             const newest = await Products.find({
                 $or: [{ isFeatured: false }, { releaseDate: { $lt: new Date() } }],
             })
+                .populate('categoryId', 'name slug')
                 .sort({ createdAt: -1 })
                 .limit(12);
 
@@ -72,10 +71,11 @@ class MeController {
     //[GET] /products/upcoming - Sản phẩm ra mắt
     async upcomingProducts(req, res, next) {
         try {
-            const upcoming = await Product.find({
+            const upcoming = await Products.find({
                 isFeatured: true,
                 releaseDate: { $gte: new Date() }, // Chưa đến ngày ra mắt
             })
+                .populate('categoryId', 'name slug')
                 .sort({ createdAt: -1 })
                 .limit(12);
 
@@ -118,7 +118,10 @@ class MeController {
 
             if (!campaign) return res.json([]);
 
-            const campaignProducts = await CampaignProducts.find({ campaignId: campaign._id }).populate('productId');
+            const campaignProducts = await CampaignProducts.find({ campaignId: campaign._id }).populate({
+                path: 'productId',
+                populate: { path: 'categoryId', select: 'name slug' },
+            });
 
             const products = campaignProducts.map((cp) => {
                 const product = cp.productId.toObject();
@@ -148,6 +151,15 @@ class MeController {
                     },
                 },
                 { $unwind: '$product' },
+                {
+                    $lookup: {
+                        from: 'categories',
+                        localField: 'product.categoryId',
+                        foreignField: '_id',
+                        as: 'product.categoryId',
+                    },
+                },
+                { $unwind: { path: '$product.categoryId', preserveNullAndEmptyArrays: true } },
             ]);
 
             const products = bestSelling.map((item) => item.product);
@@ -164,7 +176,7 @@ class MeController {
 
     // [GET] /stored/products
     storedProducts(req, res, next) {
-        Promise.all([Product.find({}).sortable(req), Product.countDocumentsWithDeleted({ deleted: true })])
+        Promise.all([Products.find({}).sortable(req), Products.countDocumentsWithDeleted({ deleted: true })])
             .then(([products, deletedCount]) =>
                 res.render('me/stored-products', {
                     deletedCount,
@@ -176,7 +188,7 @@ class MeController {
 
     // [GET] /trash/products
     trashProducts(req, res, next) {
-        Product.findWithDeleted({ deleted: true })
+        Products.findWithDeleted({ deleted: true })
             .then((products) =>
                 res.render('me/trash-products', {
                     products: mutipleMongooseToObject(products),
@@ -187,7 +199,7 @@ class MeController {
 
     // [GET] /stored/shops
     storedShops(req, res, next) {
-        Promise.all([Shop.find({}).sortable(req), Shop.countDocumentsWithDeleted({ deleted: true })])
+        Promise.all([Shops.find({}).sortable(req), Shops.countDocumentsWithDeleted({ deleted: true })])
             .then(([shops, deletedCount]) =>
                 res.render('me/stored-shops', {
                     deletedCount,
@@ -199,7 +211,7 @@ class MeController {
 
     // [GET] /trash/shops
     trashShops(req, res, next) {
-        Shop.findWithDeleted({ deleted: true })
+        Shops.findWithDeleted({ deleted: true })
             .then((shops) =>
                 res.render('me/trash-shops', {
                     shops: mutipleMongooseToObject(shops),
