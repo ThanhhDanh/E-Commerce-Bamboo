@@ -105,8 +105,9 @@ class ProductController {
         console.log('req.files:', req.files);
         try {
             let image = null;
-            if (req.file) {
-                image = req.file.path;
+            const mainImageFile = req.files?.find((file) => file.fieldname === 'image');
+            if (mainImageFile) {
+                image = mainImageFile.path;
             } else {
                 return res.status(400).json({ message: 'Ảnh sản phẩm không được để trống' });
             }
@@ -120,7 +121,7 @@ class ProductController {
             if (Array.isArray(colorIds) && colorIds.length > 0) {
                 for (const colorId of colorIds) {
                     const fileKey = `colorImage_${colorId}`;
-                    const colorImageFile = req.files?.[fileKey]?.[0];
+                    const colorImageFile = req.files?.find((file) => file.fieldname === fileKey);
 
                     colorVariants.push({
                         colorId: colorId,
@@ -173,8 +174,9 @@ class ProductController {
                     : req.body.isFeatured === 'true' || req.body.isFeatured === true,
             };
 
-            if (req.file) {
-                updateFields.image = req.file.path;
+            const mainImageFile = req.files?.find((file) => file.fieldname === 'image');
+            if (mainImageFile) {
+                updateFields.image = mainImageFile.path;
             }
 
             const colorVariants = [];
