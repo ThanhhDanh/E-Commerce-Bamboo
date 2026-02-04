@@ -11,6 +11,7 @@ const Color = new Schema(
         _id: { type: Number },
         name: { type: String, required: true },
         code: { type: String },
+        image: { type: String },
         slug: { type: String, slug: 'name', unique: true },
     },
     {

@@ -22,7 +22,8 @@
                 <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="mb-3">
                         <label for="image" class="form-label">Ảnh sản phẩm</label>
-                        <input type="file" class="form-control" id="image" value="{{oldData.image}}" name="image" placeholder="Image..." >
+                        <input type="file" class="form-control" id="image" value="{{oldData.image}}" name="image"
+                            placeholder="Image...">
                         {{{validateInput errors "image"}}}
                     </div>
                     <div class="show-img">
@@ -30,23 +31,26 @@
                     </div>
                 </div>
 
-                 <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="mb-3">
                         <label for="description" class="form-label">Mô tả sản phẩm</label>
-                        <textarea class="form-description" id="description" rows="10" name="description" placeholder="Mô tả..." rows="4" cols="50">{{oldData.description}}</textarea>
+                        <textarea class="form-description" id="description" rows="10" name="description"
+                            placeholder="Mô tả..." rows="4" cols="50">{{oldData.description}}</textarea>
                         {{{validateInput errors "description"}}}
                     </div>
                 </div>
-    
+
                 <div class="col-sm-12 col-md-3 col-lg-3">
                     <div class="mb-3">
                         <label for="name" class="form-label">Tên sản phẩm</label>
-                        <input type="text" class="form-control value="{{oldData.name}}"" id="name" name="name" placeholder="Tên sản phẩm..." >
+                        <input type="text" class="form-control value=" {{oldData.name}}"" id="name" name="name"
+                            placeholder="Tên sản phẩm...">
                         {{{validateInput errors "name"}}}
                     </div>
                     <div class="mb-3">
                         <label for="price" class="form-label">Giá sản phẩm</label>
-                        <input type="text" class="form-control" id="price" value="{{oldData.price}}" name="price" placeholder="Giá..." >
+                        <input type="text" class="form-control" id="price" value="{{oldData.price}}" name="price"
+                            placeholder="Giá...">
                         {{{validateInput errors "price"}}}
                     </div>
                 </div>
@@ -56,9 +60,9 @@
                         <select class="form-control" id="categoryId" name="categoryId">
                             <option value="">-- Chọn loại sản phẩm --</option>
                             {{#each categories}}
-                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.categoryId)}}selected{{/if}}>
-                                    {{this.name}}
-                                </option>
+                            <option value="{{this._id}}" {{#if (eq this._id ../oldData.categoryId)}}selected{{/if}}>
+                                {{this.name}}
+                            </option>
                             {{/each}}
                         </select>
                         {{{validateInput errors "categoryId"}}}
@@ -68,9 +72,9 @@
                         <select class="form-control" id="genderId" name="genderId">
                             <option value="">-- Chọn giới tính sản phẩm --</option>
                             {{#each genders}}
-                                <option value="{{this._id}}" {{#if (eq this._id ../oldData.genderId)}}selected{{/if}}>
-                                    {{this.name}}
-                                </option>
+                            <option value="{{this._id}}" {{#if (eq this._id ../oldData.genderId)}}selected{{/if}}>
+                                {{this.name}}
+                            </option>
                             {{/each}}
                         </select>
                         {{{validateInput errors "gender"}}}
@@ -82,9 +86,9 @@
                         <select class="form-control" id="userId" name="userId" disabled>
                             <option value="">-- Chủ shop của sản phẩm --</option>
                             {{#each users}}
-                                <option value="{{this._id}}" {{#if (eq this._id ../defaultUserId)}}selected{{/if}}>
-                                    {{this.firstName}}
-                                </option>
+                            <option value="{{this._id}}" {{#if (eq this._id ../defaultUserId)}}selected{{/if}}>
+                                {{this.firstName}}
+                            </option>
                             {{/each}}
                         </select>
                         <input type="hidden" name="userId" value="{{ defaultUserId }}">
@@ -95,9 +99,9 @@
                         <select class="form-control" id="shopId" name="shopId" disabled>
                             <option value="">-- Chọn cửa hàng cho sản phẩm --</option>
                             {{#each shops}}
-                                <option value="{{this._id}}" {{#if (eq this._id ../defaultShopId)}}selected{{/if}}>
-                                    {{this.name}}
-                                </option>
+                            <option value="{{this._id}}" {{#if (eq this._id ../defaultShopId)}}selected{{/if}}>
+                                {{this.name}}
+                            </option>
                             {{/each}}
                         </select>
                         <input type="hidden" name="shopId" value="{{ defaultShopId }}">
@@ -106,50 +110,73 @@
                 </div>
                 <div class="col-sm-12 col-md-3 col-lg-3">
                     <div class="mb-3">
+                        <label for="releaseDate" class="form-label">Ngày ra mắt</label>
+                        <input type="text" class="form-control flatpickr" id="releaseDate"
+                            value="{{oldData.releaseDate}}" name="releaseDate" placeholder="Ngày ra mắt sản phẩm...">
+                        {{{validateInput errors "releaseDate"}}}
+                    </div>
+                    <div class="mb-3">
+                        <label for="groundType" class="form-label">Loại giày tự nhiên / nhân tạo</label>
+                        <select class="form-control" id="groundType" name="groundType">
+                            <option value="">-- Chọn giày tự nhiên / nhân tạo --</option>
+                            {{#each (groundTypes)}}
+                            <option value="{{this}}" {{#if (eq ../oldData.groundType this)}}selected{{/if}}>
+                                {{formatGroundType this}}
+                            </option>
+                            {{/each}}
+                        </select>
+                        {{{validateInput errors "groundType"}}}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
+                        <label for="isFeatured" class="form-label mb-4">Sản phẩm ra mắt</label>
+                        <div class="checkbox-wrapper-46">
+                            <input type="hidden" name="isFeatured" value="false">
+                            <input type="checkbox" id="cbx-46" name="isFeatured" value="true" class="inp-cbx" {{#if
+                                oldData.isFeatured}}checked{{/if}} />
+                            <label for="cbx-46" class="cbx"><span>
+                                    <svg viewBox="0 0 12 10" height="10px" width="12px">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg></span><span>Sản phẩm nổi bật</span>
+                            </label>
+                        </div>
+                        {{{validateInput errors "isFeatured"}}}
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div class="mb-3">
                         <label for="sizeId" class="form-label">Kích thước sản phẩm</label>
-                        <select class="form-control select2" id="sizeId" name="sizeId[]" multiple data-live-search="true">
+                        <select class="form-control select2" id="sizeId" name="sizeId[]" multiple
+                            data-live-search="true">
                             <option value="">-- Chọn kích thước sản phẩm --</option>
                             {{#each sizes}}
-                                <option value="{{this._id}}" {{#if (arrayContains ../oldData.sizeId this._id)}}selected{{/if}}>
-                                    {{this.name}}
-                                </option>
+                            <option value="{{this._id}}" {{#if (arrayContains ../oldData.sizeId
+                                this._id)}}selected{{/if}}>
+                                {{this.name}}
+                            </option>
                             {{/each}}
                         </select>
                         {{{validateInput errors "sizeId"}}}
                     </div>
+                </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
                     <div class="mb-3">
                         <label for="colorId" class="form-label">Màu sản phẩm</label>
-                        <select class="form-control select2" id="colorId" name="colorId[]" multiple data-live-search="true">
+                        <select class="form-control select2" id="colorId" name="colorIds[]" multiple
+                            data-live-search="true">
                             <option value="">-- Chọn màu sản phẩm --</option>
                             {{#each colors}}
-                                <option value="{{this._id}}" {{#if (arrayContains ../oldData.colorId this._id)}}selected{{/if}}>
-                                    {{this.name}}
-                                </option>
+                            <option value="{{this._id}}">
+                                {{this.name}}
+                            </option>
                             {{/each}}
                         </select>
                         {{{validateInput errors "colorId"}}}
                     </div>
                 </div>
-                 <div class="col-sm-12 col-md-3 col-lg-3">
-                    <div class="mb-3">
-                        <label for="isFeatured" class="form-label mb-4">Sản phẩm ra mắt</label>
-                        <div class="checkbox-wrapper-46">
-                        <input type="hidden" name="isFeatured" value="false">
-                        <input type="checkbox" id="cbx-46" name="isFeatured" value="true" class="inp-cbx" {{#if oldData.isFeatured}}checked{{/if}}/>
-                        <label for="cbx-46" class="cbx"
-                            ><span>
-                            <svg viewBox="0 0 12 10" height="10px" width="12px">
-                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline></svg></span
-                            ><span>Sản phẩm nổi bật</span>
-                        </label>
-                        </div>
-                        {{{validateInput errors "isFeatured"}}}
-                    </div>
-                    <div class="mb-3">
-                        <label for="releaseDate" class="form-label">Ngày ra mắt</label>
-                        <input type="text" class="form-control flatpickr" id="releaseDate" value="{{oldData.releaseDate}}" name="releaseDate" placeholder="Ngày ra mắt sản phẩm..." >
-                        {{{validateInput errors "releaseDate"}}}
-                    </div>
+                <div class="col-sm-12 col-md-3 col-lg-3">
+                    <div id="color-images"></div>
                 </div>
             </div>
             <button type="submit" class="btn btn-success btn-lg">Thêm sản phẩm</button>
@@ -158,22 +185,69 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        $(document).ready(function () {
+
             $('.select2').select2({
-                placeholder: '-- Chọn --', 
+                placeholder: '-- Chọn --',
                 allowClear: true,
             });
+
+            flatpickr('.flatpickr', {
+                locale: "vn",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                defaultDate: new Date(),
+                allowInput: true
+            });
+
+            const colorSelect = document.getElementById('colorId');
+            const imagesContainer = document.getElementById('color-images');
+
+            if (!colorSelect || !imagesContainer) {
+                console.error('Không tìm thấy #colorId hoặc #color-images');
+                return;
+            }
+
+            function renderColorImageInputs() {
+
+                imagesContainer.innerHTML = '';
+
+                const selectedData = $(colorSelect).select2('data') || [];
+
+                if (selectedData.length === 0) {
+                    imagesContainer.innerHTML = '<p class="text-gray-500 italic">Chưa chọn màu nào</p>';
+                    return;
+                }
+
+                selectedData.forEach(item => {
+                    const colorId = item.id;
+                    const colorName = item.text.trim();
+
+                    const div = document.createElement('div');
+                    div.className = '';
+                    div.innerHTML = `
+                        <label class="form-label">
+                            Ảnh riêng cho màu: <strong>${colorName}</strong>
+                        </label>
+                        <input 
+                            type="file" 
+                            name="colorImage_${colorId}" 
+                            accept="image/*" 
+                            class="form-control"
+                        />
+                        <p class="text-xs text-gray-500 mt-1">Ảnh đại diện riêng cho màu này trên sản phẩm (không bắt buộc)</p>
+                    `;
+                    imagesContainer.appendChild(div);
+                });
+            }
+
+            $(colorSelect).on('change', function () {
+                renderColorImageInputs();
+            });
+
+            renderColorImageInputs();
         });
-
-        $('.flatpickr').flatpickr({
-            locale: "vn",
-            dateFormat: "Y-m-d",
-            altInput: true,
-            altFormat: "d/m/Y",
-            defaultDate: new Date(),
-            allowInput: true
-        })
-
-    })
+    });
 </script>

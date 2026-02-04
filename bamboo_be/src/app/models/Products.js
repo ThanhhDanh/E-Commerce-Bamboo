@@ -14,13 +14,23 @@ const Product = new Schema(
         description: { type: String },
         price: { type: Number, required: true },
         isFeatured: { type: Boolean, default: false },
+        groundType: {
+            type: String,
+            enum: ['FG', 'AG', 'TF', 'IC', 'SG', 'Indoor'],
+            required: false,
+        },
         releaseDate: { type: Date, default: null },
         genderId: { type: Number, ref: 'Gender', required: true },
         userId: { type: Number, ref: 'User', required: true },
         categoryId: { type: Number, ref: 'Category', required: true },
         shopId: { type: Number, ref: 'Shop', required: true },
         sizeIds: [{ type: Number, ref: 'Size' }],
-        colorIds: [{ type: Number, ref: 'Color' }],
+        colorVariants: [
+            {
+                colorId: { type: Number, ref: 'Color' },
+                image: { type: String },
+            },
+        ],
         slug: { type: String, slug: 'name', unique: true },
     },
     {

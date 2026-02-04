@@ -26,7 +26,21 @@ class MeController {
             const filter = {};
             if (req.query.category) filter.categoryId = req.query.category;
 
-            const products = await Products.find(filter).sort(sortQuery).skip(skip).limit(limit);
+            if (req.query.groundType) filter.groundType = req.query.groundType;
+            if (req.query.size) filter.sizeIds = { $in: req.query.size.split(',') };
+            if (req.query.minPrice || req.query.maxPrice) {
+                filter.price = {};
+                if (req.query.minPrice) filter.price.$gte = parseInt(req.query.minPrice);
+                if (req.query.maxPrice) filter.price.$lte = parseInt(req.query.maxPrice);
+            }
+
+            const products = await Products.find(filter)
+                .populate('categoryId', 'name slug')
+                .populate('colorVariants.colorId', 'name code')
+                .populate('sizeIds', 'name')
+                .sort(sortQuery)
+                .skip(skip)
+                .limit(limit);
 
             const productsWithSale = await mergeCampaignPrice(products);
 
@@ -52,6 +66,7 @@ class MeController {
                 $or: [{ isFeatured: false }, { releaseDate: { $lt: new Date() } }],
             })
                 .populate('categoryId', 'name slug')
+                .populate('colorVariants.colorId', 'name code')
                 .sort({ createdAt: -1 })
                 .limit(12);
 
@@ -76,6 +91,7 @@ class MeController {
                 releaseDate: { $gte: new Date() }, // Chưa đến ngày ra mắt
             })
                 .populate('categoryId', 'name slug')
+                .populate('colorVariants.colorId', 'name code')
                 .sort({ createdAt: -1 })
                 .limit(12);
 
