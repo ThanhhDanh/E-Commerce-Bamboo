@@ -8,6 +8,7 @@ const apiAuthController = require('../../app/controllers/ApiAuthController');
 const authenticateToken = require('../../app/middlewares/authenticateToken');
 const ordersController = require('../../app/controllers/OrdersController');
 const cartsController = require('../../app/controllers/CartController');
+const likesController = require('../../app/controllers/LikeController');
 
 // API routes
 
@@ -50,5 +51,9 @@ router.post('/login', apiAuthController.login);
 router.post('/refresh', apiAuthController.refresh);
 router.post('/logout', apiAuthController.logout);
 router.get('/me', authenticateToken, apiAuthController.me);
+
+// API Likes
+router.get('/likes/:userId/list', likesController.listLike);
+router.post('/likes/toggle', likesController.toggleLike);
 
 module.exports = router;

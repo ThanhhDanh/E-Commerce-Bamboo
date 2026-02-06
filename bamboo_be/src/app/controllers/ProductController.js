@@ -17,7 +17,7 @@ class ProductController {
         try {
             const product = await Product.findOne({ slug: req.params.slug })
                 .populate('categoryId', 'name slug')
-                .populate('colorIds', 'name code image')
+                .populate('colorVariants.colorId', 'name code')
                 .populate('sizeIds', 'name')
                 .lean();
 
@@ -59,6 +59,8 @@ class ProductController {
             })
             .catch(next);
     }
+
+    // ----------------------------------------------------------------------------------------------
 
     // [GET] /products/:slug
     show(req, res, next) {
